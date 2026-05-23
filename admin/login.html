@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin Login — Kerala Lottery</title>
+<link rel="stylesheet" href="admin.css"/>
+</head>
+<body class="login-page">
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">🎰</div>
+    <h1 class="login-title">Kerala Lottery</h1>
+    <p class="login-sub">Admin Dashboard</p>
+    <form id="loginForm" class="login-form">
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input type="password" id="password" class="field-input" placeholder="Enter admin password" required/>
+      </div>
+      <div id="loginError" class="login-error hidden">Incorrect password</div>
+      <button type="submit" class="btn-primary btn-full" id="loginBtn">Sign In</button>
+    </form>
+    <p style="margin-top:18px;font-size:.75rem;color:#6a8a6d;text-align:center">
+      Password set in supabase-config.js
+    </p>
+  </div>
+</div>
+<script src="../supabase-config.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const pw  = document.getElementById('password').value;
+  const err = document.getElementById('loginError');
+  if (pw === ADMIN_PASSWORD) {
+    sessionStorage.setItem('kl_admin', '1');
+    window.location.href = 'index.html';
+  } else {
+    err.classList.remove('hidden');
+    document.getElementById('loginBtn').textContent = 'Sign In';
+  }
+});
+// Already logged in?
+if (sessionStorage.getItem('kl_admin')) window.location.href = 'index.html';
+</script>
+</body>
+</html>

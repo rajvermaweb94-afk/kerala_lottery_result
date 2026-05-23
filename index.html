@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kerala Lottery – Premium Result Platform</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<!-- FLOATING PARTICLES -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- LIVE TICKER -->
+<div class="ticker-wrap">
+  <span class="live-dot"></span>
+  <span class="live-label">LIVE</span>
+  <div class="ticker-track">
+    <span class="ticker-item">🏆 Karunya KR-702 Result Published &nbsp;|&nbsp; 1st Prize ₹1 Crore &nbsp;|&nbsp; Next Draw at 3 PM &nbsp;|&nbsp; Nirmal NR-389 Result Out &nbsp;|&nbsp; Win-Win W-780 Published &nbsp;|&nbsp; Akshaya AK-651 Result Live &nbsp;|&nbsp; Karunya Plus KN-570 Result Out &nbsp;|&nbsp; Sthree Sakthi SS-420 Published &nbsp;|&nbsp;</span>
+    <span class="ticker-item">🏆 Karunya KR-702 Result Published &nbsp;|&nbsp; 1st Prize ₹1 Crore &nbsp;|&nbsp; Next Draw at 3 PM &nbsp;|&nbsp; Nirmal NR-389 Result Out &nbsp;|&nbsp; Win-Win W-780 Published &nbsp;|&nbsp; Akshaya AK-651 Result Live &nbsp;|&nbsp; Karunya Plus KN-570 Result Out &nbsp;|&nbsp; Sthree Sakthi SS-420 Published &nbsp;|&nbsp;</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="container nav-container">
+    <div class="logo">
+      <div class="logo-icon">🎰</div>
+      <div>
+        <span class="logo-text">Kerala<span class="gold">Lottery</span></span>
+        <span class="logo-sub">Premium Result Platform</span>
+      </div>
+    </div>
+    <nav class="desktop-nav">
+      <a href="#home" class="nav-link active">Home</a>
+      <a href="#results" class="nav-link">Results</a>
+      <a href="#winners" class="nav-link">Winners</a>
+      <a href="#history" class="nav-link">History</a>
+    </nav>
+    <div class="nav-actions">
+      <span class="live-badge"><span class="pulse-dot"></span> Live</span>
+      <button class="btn-gold" onclick="scrollToChecker()">Check Result</button>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#home" class="mob-link">Home</a>
+    <a href="#results" class="mob-link">Results</a>
+    <a href="#winners" class="mob-link">Winners</a>
+    <a href="#history" class="mob-link">History</a>
+  </div>
+</header>
+
+<!-- HERO SECTION -->
+<section class="hero" id="home">
+
+  <!-- Deep layered background glows -->
+  <div class="hero-glow hero-glow-1"></div>
+  <div class="hero-glow hero-glow-2"></div>
+  <div class="hero-glow hero-glow-3"></div>
+  <div class="hero-glow hero-glow-4"></div>
+  <div class="hero-glow hero-glow-5"></div>
+
+  <!-- Light beam effects -->
+  <div class="light-beam lb-1"></div>
+  <div class="light-beam lb-2"></div>
+  <div class="light-beam lb-3"></div>
+
+  <!-- Gold particle canvas (hero-specific) -->
+  <canvas id="heroGoldCanvas"></canvas>
+
+  <!-- Animated lottery balls -->
+  <div class="lottery-balls-wrap">
+    <div class="lottery-ball lb-ball-1"><span>7</span></div>
+    <div class="lottery-ball lb-ball-2"><span>3</span></div>
+    <div class="lottery-ball lb-ball-3"><span>9</span></div>
+    <div class="lottery-ball lb-ball-4"><span>1</span></div>
+    <div class="lottery-ball lb-ball-5"><span>5</span></div>
+    <div class="lottery-ball lb-ball-6"><span>2</span></div>
+  </div>
+
+  <!-- Floating glowing coins -->
+  <div class="coin coin-1">₹</div>
+  <div class="coin coin-2">₹</div>
+  <div class="coin coin-3">₹</div>
+  <div class="coin coin-4">₹</div>
+  <div class="coin coin-5">₹</div>
+
+  <!-- Floating ticket cards: 2 left, 1 right -->
+  <div class="floating-ticket ft-1">
+    <div class="ft-inner">
+      <div class="ft-logo">🎰</div>
+      <span class="ft-label">KARUNYA KR-702</span>
+      <span class="ft-prize">₹1 Crore</span>
+      <span class="ft-tag">🏆 1st Prize</span>
+      <div class="ft-glow-ring"></div>
+    </div>
+  </div>
+  <div class="floating-ticket ft-3">
+    <div class="ft-inner">
+      <div class="ft-logo">⭐</div>
+      <span class="ft-label">AKSHAYA AK-651</span>
+      <span class="ft-prize">₹70 Lakh</span>
+      <span class="ft-tag">🥇 1st Prize</span>
+      <div class="ft-glow-ring"></div>
+    </div>
+  </div>
+  <div class="floating-ticket ft-2">
+    <div class="ft-inner">
+      <div class="ft-logo">🎯</div>
+      <span class="ft-label">NIRMAL NR-389</span>
+      <span class="ft-prize">₹70 Lakh</span>
+      <span class="ft-tag">🥇 1st Prize</span>
+      <div class="ft-glow-ring"></div>
+    </div>
+  </div>
+
+  <!-- Main hero content -->
+  <div class="container hero-content">
+    <div class="hero-badge">
+      <span class="pulse-dot"></span>
+      Today's Results Are Live
+    </div>
+    <h1 class="hero-title">
+      Check Your <span class="gold-gradient">Kerala Lottery</span><br/>Result Instantly
+    </h1>
+    <p class="hero-subtitle">Fast, trusted Kerala lottery result checking platform.</p>
+
+    <!-- Stats row — 3 items -->
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-value">₹1 Crore</span>
+        <span class="hero-stat-label">Jackpot</span>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">3 PM</span>
+        <span class="hero-stat-label">Daily Draw</span>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">100%</span>
+        <span class="hero-stat-label">Verified Results</span>
+      </div>
+    </div>
+
+    <div class="trust-row">
+      <span class="trust-item"><i data-lucide="shield-check"></i> Verified Results</span>
+      <span class="trust-item"><i data-lucide="zap"></i> Instant Checking</span>
+      <span class="trust-item"><i data-lucide="clock"></i> Updated Daily</span>
+    </div>
+  </div>
+
+  <!-- Bottom wave -->
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#030f0a"/>
+    </svg>
+  </div>
+</section>
+
+<!-- RESULT CHECKER SECTION -->
+<section class="section checker-section" id="checker">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Result Checker</span>
+      <h2 class="section-title">Check Your <span class="gold-gradient">Ticket Result</span></h2>
+      <p class="section-sub">Enter your ticket details below for an instant result</p>
+    </div>
+
+    <div class="checker-card glass-card">
+      <div class="checker-grid-simple">
+        <div class="form-group">
+          <label class="form-label"><i data-lucide="calendar"></i> Draw Date</label>
+          <input type="date" id="drawDate" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label"><i data-lucide="ticket"></i> Ticket Number</label>
+          <div class="ticket-input-wrap">
+            <input type="text" id="ticketNumber" placeholder="e.g. KR 123456 or AK 567890" class="form-input" />
+            <button class="scan-btn" title="Scan Ticket" onclick="openScanner()">
+              <i data-lucide="camera"></i>
+              <span>Scan</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <p class="checker-hint">Lottery type is detected automatically from your ticket prefix (KR, AK, NR, KN…)</p>
+      <button class="btn-gold-full" onclick="checkResult()">
+        <i data-lucide="search"></i> Check My Result
+      </button>
+      <div id="resultDisplay" class="result-display hidden"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TODAY LIVE RESULTS -->
+<section class="section" id="results">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Today's Draw</span>
+      <h2 class="section-title">Live <span class="gold-gradient">Results</span></h2>
+      <p class="section-sub">Karunya KR-702 | Saturday, 21 May 2026 | 3:00 PM</p>
+    </div>
+
+    <!-- 1st Prize — Hero Card -->
+    <div class="prize-hero-wrap">
+      <div class="prize-hero-card glass-card">
+        <!-- Animated gold border -->
+        <div class="prize-hero-border"></div>
+        <!-- Crown glow -->
+        <div class="prize-hero-crown-glow"></div>
+        <div class="prize-hero-inner">
+          <div class="prize-hero-top">
+            <span class="prize-hero-rank-badge">👑 1st Prize — Jackpot</span>
+            <span class="prize-hero-draw">Karunya KR-702 | 21 May 2026</span>
+          </div>
+          <div class="prize-hero-crown">👑</div>
+          <div class="prize-hero-trophy">🏆</div>
+          <div class="prize-hero-amount" id="jackpotAmount">₹1,00,00,000</div>
+          <div class="prize-hero-words">One Crore Rupees</div>
+          <div class="prize-hero-ticket-wrap">
+            <span class="prize-hero-ticket-label">Winning Ticket</span>
+            <div class="prize-hero-ticket" id="jackpotTicket">KR 456789</div>
+          </div>
+          <div class="prize-hero-actions">
+            <button class="btn-check-mine" onclick="document.getElementById('ticketNumber').value='KR 456789'; scrollToChecker();">
+              <i data-lucide="search"></i> Check If It's Mine
+            </button>
+            <button class="btn-share-result">
+              <i data-lucide="share-2"></i> Share
+            </button>
+          </div>
+        </div>
+        <!-- Corner sparkles -->
+        <div class="sparkle sp-1">✦</div>
+        <div class="sparkle sp-2">✦</div>
+        <div class="sparkle sp-3">✦</div>
+        <div class="sparkle sp-4">✦</div>
+      </div>
+    </div>
+
+    <!-- 2nd, 3rd, Consolation -->
+    <div class="prize-grid">
+      <div class="prize-card prize-second glass-card">
+        <div class="prize-rank">2nd Prize</div>
+        <div class="prize-icon">🥈</div>
+        <div class="prize-amount">₹10,00,000</div>
+        <div class="prize-ticket">KR 234567</div>
+        <div class="prize-label">Ten Lakhs</div>
+        <div class="prize-meta">Karunya KR-702 | 21 May 2026</div>
+      </div>
+      <div class="prize-card prize-third glass-card">
+        <div class="prize-rank">3rd Prize</div>
+        <div class="prize-icon">🥉</div>
+        <div class="prize-amount">₹5,00,000</div>
+        <div class="prize-ticket">KR 345678</div>
+        <div class="prize-label">Five Lakhs</div>
+        <div class="prize-meta">Karunya KR-702 | 21 May 2026</div>
+      </div>
+      <div class="prize-card prize-consolation glass-card">
+        <div class="prize-rank">Consolation</div>
+        <div class="prize-icon">🎁</div>
+        <div class="prize-amount">₹8,000</div>
+        <div class="prize-ticket">Multiple</div>
+        <div class="prize-label">Eight Thousand</div>
+        <div class="prize-meta">Karunya KR-702 | 21 May 2026</div>
+      </div>
+    </div>
+
+    <div class="more-prizes glass-card">
+      <div class="more-prizes-header" onclick="toggleMorePrizes()">
+        <span><i data-lucide="list"></i> View All Prize Tiers (4th – 8th Prize)</span>
+        <i data-lucide="chevron-down" id="morePrizesChevron"></i>
+      </div>
+      <div id="morePrizesBody" class="more-prizes-body hidden">
+        <table class="prize-table">
+          <thead><tr><th>Prize</th><th>Amount</th><th>Winning Numbers</th></tr></thead>
+          <tbody>
+            <tr><td>4th Prize</td><td>₹2,00,000</td><td>1234 2345 3456 4567 5678</td></tr>
+            <tr><td>5th Prize</td><td>₹1,00,000</td><td>6789 7890 8901 9012 0123</td></tr>
+            <tr><td>6th Prize</td><td>₹5,000</td><td>Last 4 digits: 1234</td></tr>
+            <tr><td>7th Prize</td><td>₹2,000</td><td>Last 4 digits: 5678</td></tr>
+            <tr><td>8th Prize</td><td>₹1,000</td><td>Last 3 digits: 456</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTDOWN TIMER -->
+<section class="section countdown-section">
+  <div class="container">
+    <div class="countdown-wrap glass-card">
+      <div class="countdown-left">
+        <div class="section-tag">Next Draw</div>
+        <h2 class="countdown-title">Next Draw <span class="gold-gradient">Starts In</span></h2>
+        <p class="countdown-sub">Nirmal NR-390 | Wednesday, 22 May 2026 | 3:00 PM</p>
+      </div>
+      <div class="countdown-right">
+        <div class="timer-block">
+          <div class="timer-value" id="timerHours">00</div>
+          <div class="timer-label">Hours</div>
+        </div>
+        <div class="timer-sep">:</div>
+        <div class="timer-block">
+          <div class="timer-value" id="timerMinutes">00</div>
+          <div class="timer-label">Minutes</div>
+        </div>
+        <div class="timer-sep">:</div>
+        <div class="timer-block">
+          <div class="timer-value" id="timerSeconds">00</div>
+          <div class="timer-label">Seconds</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RECENT WINNERS -->
+<section class="section" id="winners">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Winners</span>
+      <h2 class="section-title">Recent <span class="gold-gradient">Winners</span></h2>
+      <p class="section-sub">Real winners from across Kerala — updated daily</p>
+    </div>
+    <div class="winners-scroll-wrap">
+      <div class="winners-track" id="winnersTrack"></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULT HISTORY -->
+<section class="section" id="history">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">History</span>
+      <h2 class="section-title">Result <span class="gold-gradient">History</span></h2>
+    </div>
+    <div class="history-card glass-card reveal reveal-up">
+      <div class="history-controls">
+        <div class="search-wrap">
+          <i data-lucide="search"></i>
+          <input type="text" id="historySearch" placeholder="Search draw name or number…" class="history-search" oninput="filterHistory()" />
+        </div>
+        <select id="historyFilter" class="form-input history-filter" onchange="filterHistory()">
+          <option value="">All Lotteries</option>
+          <option>Karunya</option>
+          <option>Nirmal</option>
+          <option>Win-Win</option>
+          <option>Akshaya</option>
+          <option>Karunya Plus</option>
+          <option>Sthree Sakthi</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Draw Name</th>
+              <th>Date</th>
+              <th>1st Prize Number</th>
+              <th>Prize Amount</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section features-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Why Choose Us</span>
+      <h2 class="section-title">Premium <span class="gold-gradient">Features</span></h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card glass-card reveal reveal-up" style="--reveal-delay:0ms">
+        <div class="feature-icon">⚡</div>
+        <h3>Instant Result Checking</h3>
+        <p>Get your lottery result in milliseconds. No waiting, no delays.</p>
+      </div>
+      <div class="feature-card glass-card reveal reveal-up" style="--reveal-delay:100ms">
+        <div class="feature-icon">🔒</div>
+        <h3>Secure Verification</h3>
+        <p>All results are verified directly from official Kerala government sources.</p>
+      </div>
+      <div class="feature-card glass-card reveal reveal-up" style="--reveal-delay:200ms">
+        <div class="feature-icon">📅</div>
+        <h3>Daily Draw Results</h3>
+        <p>All 8 weekly Kerala lotteries covered — every single day.</p>
+      </div>
+      <div class="feature-card glass-card reveal reveal-up" style="--reveal-delay:300ms">
+        <div class="feature-icon">📱</div>
+        <h3>Mobile Friendly</h3>
+        <p>Optimized for all devices. Check results on the go, anytime.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-top-line"></div>
+  <div class="container">
+
+    <!-- Row 1: Quick links -->
+    <nav class="footer-links">
+      <a href="#home" class="footer-link">Home</a>
+      <span class="footer-dot">•</span>
+      <a href="#results" class="footer-link">Results</a>
+      <span class="footer-dot">•</span>
+      <a href="#winners" class="footer-link">Winners</a>
+      <span class="footer-dot">•</span>
+      <a href="#history" class="footer-link">History</a>
+      <span class="footer-dot">•</span>
+      <a href="#" class="footer-link">Contact</a>
+    </nav>
+
+    <!-- Row 2: Disclaimer -->
+    <p class="footer-disclaimer-text">
+      Independent Kerala lottery result platform. Verify results with official sources before claiming prizes.
+    </p>
+
+    <!-- Row 3: Bottom bar -->
+    <div class="footer-bottom">
+      <span>© 2026 KeralaLottery Premium</span>
+      <span class="footer-live">
+        <span class="footer-live-dot"></span> Live Platform
+      </span>
+    </div>
+
+  </div>
+</footer>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav">
+  <a href="#home" class="mob-nav-item active">
+    <i data-lucide="home"></i><span>Home</span>
+  </a>
+  <a href="#results" class="mob-nav-item">
+    <i data-lucide="trophy"></i><span>Results</span>
+  </a>
+  <a href="#winners" class="mob-nav-item">
+    <i data-lucide="star"></i><span>Winners</span>
+  </a>
+  <a href="#" class="mob-nav-item">
+    <i data-lucide="headphones"></i><span>Support</span>
+  </a>
+</nav>
+
+<!-- FLOATING SUPPORT BUTTONS -->
+<div class="floating-support">
+  <a href="https://wa.me/919876543210" class="float-btn whatsapp" title="WhatsApp Support" target="_blank">
+    <span class="float-icon">💬</span>
+  </a>
+  <a href="https://t.me/keralalottery" class="float-btn telegram" title="Telegram Channel" target="_blank">
+    <span class="float-icon">✈️</span>
+  </a>
+  <button class="float-btn support" title="Live Support" onclick="alert('Support chat coming soon!')">
+    <span class="float-icon">🎧</span>
+  </button>
+</div>
+
+<!-- SCANNER MODAL -->
+<div class="scanner-overlay" id="scannerOverlay" onclick="closeScanner(event)">
+  <div class="scanner-modal glass-card">
+    <button class="scanner-close" onclick="closeScanner(true)">
+      <i data-lucide="x"></i>
+    </button>
+    <div class="scanner-header">
+      <div class="scanner-icon-wrap">
+        <i data-lucide="camera"></i>
+      </div>
+      <h3 class="scanner-title">Scan Your Ticket</h3>
+      <p class="scanner-sub">Point your camera at the barcode or QR code on your lottery ticket</p>
+    </div>
+
+    <!-- Camera viewfinder -->
+    <div class="scanner-viewfinder" id="scannerViewfinder">
+      <video id="scannerVideo" autoplay playsinline muted></video>
+      <div class="scanner-frame">
+        <div class="scanner-corner sc-tl"></div>
+        <div class="scanner-corner sc-tr"></div>
+        <div class="scanner-corner sc-bl"></div>
+        <div class="scanner-corner sc-br"></div>
+        <div class="scanner-laser"></div>
+      </div>
+      <div class="scanner-hint-overlay">
+        <span class="scanner-hint-text">Align barcode within the frame</span>
+      </div>
+    </div>
+
+    <!-- Manual fallback -->
+    <div class="scanner-divider"><span>or enter manually</span></div>
+    <div class="scanner-manual">
+      <input type="text" id="scannerManualInput" class="form-input" placeholder="Type ticket number e.g. KR 456789" />
+      <button class="btn-gold-full" style="margin-top:12px" onclick="confirmScanManual()">
+        <i data-lucide="check"></i> Use This Number
+      </button>
+    </div>
+
+    <!-- Demo scan button -->
+    <button class="scanner-demo-btn" onclick="demoScan()">
+      <i data-lucide="zap"></i> Demo: Auto-detect Sample Ticket
+    </button>
+  </div>
+</div>
+
+<!-- CONFETTI CANVAS -->
+<canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+<script src="supabase-config.js"></script>
+<script src="supabase-api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

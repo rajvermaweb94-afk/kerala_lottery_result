@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin — Kerala Lottery</title>
+<link rel="stylesheet" href="admin.css"/>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <span>🎰</span>
+    <div><div class="sidebar-logo-text">KeralaLottery</div><div class="sidebar-logo-sub">Admin Panel</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-item active" data-page="dashboard"><span>📊</span> Dashboard</a>
+    <a href="#" class="nav-item" data-page="draws"><span>🎯</span> Manage Results</a>
+    <a href="#" class="nav-item" data-page="winners"><span>🏆</span> Winners</a>
+    <a href="#" class="nav-item" data-page="settings"><span>⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <span class="sidebar-user">admin</span>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</aside>
+
+<div class="topbar">
+  <button class="hamburger-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+  <div class="topbar-title" id="pageTitle">Dashboard</div>
+  <div class="topbar-live"><span class="live-dot"></span> Supabase Live</div>
+</div>
+
+<main class="main-content" id="mainContent"></main>
+
+<div class="modal-overlay hidden" id="drawModal">
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="modalTitle">Add Draw</h3><button class="modal-close" onclick="closeModal('drawModal')">✕</button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="winnerModal">
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="winnerModalTitle">Add Winner</h3><button class="modal-close" onclick="closeModal('winnerModal')">✕</button></div>
+    <div class="modal-body" id="winnerModalBody"></div>
+  </div>
+</div>
+
+<div id="toastBox" style="position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px"></div>
+
+<script src="../supabase-config.js"></script>
+<script src="../supabase-api.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

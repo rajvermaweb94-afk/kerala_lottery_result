@@ -9,7 +9,7 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
    ADMIN PASSWORD
    Change this before deploying!
    ===================================================== */
-const ADMIN_PASSWORD = 'admin123';
+const ADMIN_PASSWORD = 'KeralaLottery@2026';
 
 /* =====================================================
    HOW TO SET UP SUPABASE TABLES

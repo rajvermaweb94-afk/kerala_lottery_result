@@ -277,24 +277,56 @@ async function loadHistory() {
 }
 
 function initCountdown() {
-  // Next draw: tomorrow at 3 PM
-  const now = new Date();
-  const target = new Date(now);
-  target.setDate(target.getDate() + 1);
-  target.setHours(15, 0, 0, 0);
+  // Always counts down to the NEXT 3:00 PM IST (UTC+5:30)
+  // If it's already past 3 PM IST today, targets tomorrow's 3 PM IST
+
+  function getNext3PMIST() {
+    const now = new Date();
+
+    // IST offset = UTC + 5h 30m = 330 minutes
+    const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+    // Current time in IST
+    const nowIST = new Date(now.getTime() + IST_OFFSET_MS);
+
+    // Build today's 3 PM IST as a UTC date
+    const target = new Date(Date.UTC(
+      nowIST.getUTCFullYear(),
+      nowIST.getUTCMonth(),
+      nowIST.getUTCDate(),
+      9, 30, 0, 0   // 15:00 IST = 09:30 UTC
+    ));
+
+    // If 3 PM IST has already passed today, move to tomorrow
+    if (now >= target) {
+      target.setUTCDate(target.getUTCDate() + 1);
+    }
+
+    return target;
+  }
+
+  let target = getNext3PMIST();
 
   function update() {
-    const diff = target - new Date();
-    if (diff <= 0) { clearInterval(interval); return; }
+    const now  = new Date();
+    let   diff = target - now;
+
+    // When timer hits zero, reset to next day's 3 PM IST
+    if (diff <= 0) {
+      target = getNext3PMIST();
+      diff   = target - new Date();
+    }
+
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    animateTimerValue('timerHours', String(h).padStart(2, '0'));
+    animateTimerValue('timerHours',   String(h).padStart(2, '0'));
     animateTimerValue('timerMinutes', String(m).padStart(2, '0'));
     animateTimerValue('timerSeconds', String(s).padStart(2, '0'));
   }
+
   update();
-  const interval = setInterval(update, 1000);
+  setInterval(update, 1000);
 }
 
 function animateTimerValue(id, val) {
@@ -327,6 +359,7 @@ const WINNING_NUMBERS = ['KR 456789', 'AB 123456', 'NR 234567', 'AK 345678', 'KN
 
 // Auto-detect lottery name from ticket prefix
 const LOTTERY_PREFIX_MAP = {
+  KL: 'Kerala Lottery',
   KR: 'Karunya', NR: 'Nirmal', WW: 'Win-Win', AK: 'Akshaya',
   KN: 'Karunya Plus', SS: 'Sthree Sakthi', FF: 'Fifty-Fifty', BM: 'Bhagyamithra',
 };

@@ -1,6 +1,6 @@
 /* Kerala Lottery — Supabase Admin Panel */
 
-const CODES = ['KR','NR','WW','AK','KN','SS','FF','BM'];
+const CODES = ['KL','KR','NR','WW','AK','KN','SS','FF','BM'];
 const CATS  = [
   {c:'1st Prize',r:1},{c:'2nd Prize',r:2},{c:'3rd Prize',r:3},
   {c:'Consolation',r:4},{c:'4th Prize',r:5},{c:'5th Prize',r:6}

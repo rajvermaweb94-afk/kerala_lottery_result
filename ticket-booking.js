@@ -112,6 +112,11 @@ async function loadSettings() {
       qrImage.style.display = 'none';
       qrPlaceholder.style.display = 'flex';
     }
+
+    // Dynamic Live Chat script injection
+    if (bookingSettings.live_chat_enabled && bookingSettings.tawk_embed_code) {
+      injectTawkScript(bookingSettings.tawk_embed_code);
+    }
   } catch (e) {
     console.warn("Using offline fallback settings", e);
   }
@@ -410,7 +415,42 @@ async function reserveAndProceedToPayment() {
       await db.updateTicketStatus(id, 'HELD', heldUntil, sessionToken);
     }
     
-    // 3. Create initial booking record in database
+    // 3. Round-robin assign support numbers
+    let assignedWap = '';
+    let assignedCall = '';
+    
+    try {
+      const activeWaps = await db.getActiveWhatsappNumbers();
+      const activeCalls = await db.getActiveCallNumbers();
+      const lastBooking = await db.getLastBooking();
+      
+      if (activeWaps.length > 0) {
+        if (lastBooking && lastBooking.assigned_whatsapp_number) {
+          const idx = activeWaps.findIndex(w => w.phone_number === lastBooking.assigned_whatsapp_number);
+          assignedWap = activeWaps[idx !== -1 ? (idx + 1) % activeWaps.length : 0].phone_number;
+        } else {
+          assignedWap = activeWaps[0].phone_number;
+        }
+      } else {
+        assignedWap = bookingSettings.whatsapp_number || '919876543210';
+      }
+      
+      if (activeCalls.length > 0) {
+        if (lastBooking && lastBooking.assigned_call_number) {
+          const idx = activeCalls.findIndex(c => c.phone_number === lastBooking.assigned_call_number);
+          assignedCall = activeCalls[idx !== -1 ? (idx + 1) % activeCalls.length : 0].phone_number;
+        } else {
+          assignedCall = activeCalls[0].phone_number;
+        }
+      } else {
+        assignedCall = bookingSettings.whatsapp_number || '919876543210';
+      }
+    } catch (err) {
+      console.warn("Round-robin support assignment failed, using defaults", err);
+      assignedWap = bookingSettings.whatsapp_number || '919876543210';
+      assignedCall = bookingSettings.whatsapp_number || '919876543210';
+    }
+
     const bookingId = 'KB-' + Math.floor(100000 + Math.random() * 900000);
     const bookingData = {
       booking_id: bookingId,
@@ -421,6 +461,8 @@ async function reserveAndProceedToPayment() {
       ticket_count: selectedIds.length,
       total_amount: selectedIds.length * 40,
       status: 'PENDING PAYMENT',
+      assigned_whatsapp_number: assignedWap,
+      assigned_call_number: assignedCall,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -529,6 +571,28 @@ async function handlePaymentSubmit(e) {
     document.getElementById('finalTicketsList').textContent = document.getElementById('confirmTicketsList').textContent;
     document.getElementById('finalTotal').textContent = document.getElementById('confirmTotal').textContent;
     
+    // Configure support channel buttons
+    const wapBtn = document.getElementById('custBtnWhatsapp');
+    const callBtn = document.getElementById('custBtnCall');
+    const chatBtn = document.getElementById('custBtnChat');
+    
+    wapBtn.style.display = bookingSettings.whatsapp_enabled ? '' : 'none';
+    
+    if (bookingSettings.call_enabled && currentBooking.assigned_call_number) {
+      callBtn.href = `tel:+${currentBooking.assigned_call_number.replace(/\D/g, '')}`;
+      callBtn.style.display = '';
+    } else {
+      callBtn.style.display = 'none';
+    }
+    
+    chatBtn.style.display = bookingSettings.live_chat_enabled ? '' : 'none';
+    
+    // Initial status badge setting
+    updateStatusBadge('PAYMENT SUBMITTED');
+    
+    // Start polling DB for status updates
+    startStatusPolling(currentBooking.booking_id);
+
     // Transitions to Step 3
     document.getElementById('stepPayment').style.display = 'none';
     document.getElementById('stepSubmitted').style.display = '';
@@ -556,30 +620,40 @@ function readFileAsBase64(file) {
   });
 }
 
-/* ── Send WhatsApp Message with Details ── */
 function sendWhatsAppMessage() {
   if (!currentBooking) return;
   
-  const phone = bookingSettings.whatsapp_number.replace(/\D/g, '');
+  const assignedPhone = currentBooking.assigned_whatsapp_number || bookingSettings.whatsapp_number;
+  const phone = assignedPhone.replace(/\D/g, '');
   const activeDraw = bookingDraws.find(d => d.id == selectedDrawId);
   const drawDateStr = activeDraw ? formatDate(activeDraw.draw_date) : '';
   const selectedTickets = bookingTickets.filter(t => selectedTicketIds.has(t.id));
-  const tNumbers = selectedTickets.map(t => t.ticket_number).join(', ');
   
-  const text = `*Ticket Booking Request*
+  // Format tickets line by line
+  const tLines = selectedTickets.map(t => t.ticket_number).join('\n');
+  
+  const text = `Ticket Booking Details
 
-*Booking ID:* ${currentBooking.booking_id}
-*Booking Date:* ${drawDateStr}
-*Selected Tickets:* ${tNumbers}
-*Total Tickets:* ${currentBooking.ticket_count}
-*Price Per Ticket:* ₹40
-*Total Amount:* ₹${currentBooking.total_amount}
+Booking ID: ${currentBooking.booking_id}
 
-*Customer Name:* ${currentBooking.customer_name}
-*Mobile:* ${currentBooking.mobile_number}
-*UTR:* ${currentBooking.utr_number}
+Booking Date: ${drawDateStr}
 
-*Payment Status:* Payment Details Submitted`;
+Customer Name: ${currentBooking.customer_name}
+
+Mobile: ${currentBooking.mobile_number}
+
+Selected Tickets:
+${tLines}
+
+Number of Tickets: ${currentBooking.ticket_count}
+
+Price Per Ticket: ₹40
+
+Total Amount: ₹${currentBooking.total_amount}
+
+UTR: ${currentBooking.utr_number}
+
+Payment Status: ${currentBooking.status || 'Payment Details Submitted'}`;
 
   const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   window.open(url, '_blank');
@@ -619,4 +693,88 @@ function showToast(msg, type = 'info') {
   toast.textContent = msg;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 4000);
+}
+
+/* ── Live Status Polling & UI Updates ── */
+let statusInterval = null;
+function startStatusPolling(bookingId) {
+  if (statusInterval) clearInterval(statusInterval);
+  statusInterval = setInterval(async () => {
+    try {
+      const db = getDB();
+      const rows = await db._req('ticket_bookings', 'GET', null, `?booking_id=eq.${bookingId}`);
+      if (rows && rows.length) {
+        const b = rows[0];
+        updateStatusBadge(b.status);
+      }
+    } catch (e) {
+      console.warn("Error polling booking status", e);
+    }
+  }, 10000);
+}
+
+function updateStatusBadge(status) {
+  const badge = document.getElementById('finalStatusBadge');
+  if (!badge) return;
+  
+  badge.className = 'st';
+  
+  if (status === 'CONFIRMED' || status === 'VERIFIED') {
+    badge.textContent = "Payment Verified / Booking Confirmed";
+    badge.classList.add('st-published');
+    clearInterval(statusInterval);
+  } else if (status === 'REJECTED') {
+    badge.textContent = "Payment Verification Failed / Booking Rejected";
+    badge.classList.add('st-upcoming');
+    clearInterval(statusInterval);
+  } else if (status === 'EXPIRED') {
+    badge.textContent = "Booking Hold Expired";
+    badge.classList.add('st-upcoming');
+    clearInterval(statusInterval);
+  } else {
+    badge.textContent = "Payment Verification Pending";
+    badge.classList.add('st-live');
+  }
+}
+
+/* ── Dynamic Live Chat injection ── */
+function injectTawkScript(embedCode) {
+  if (window.Tawk_API || document.getElementById('tawk-injected')) return;
+  try {
+    const container = document.createElement('div');
+    container.id = 'tawk-injected';
+    container.style.display = 'none';
+    container.innerHTML = embedCode.trim();
+    
+    const scriptNode = container.querySelector('script');
+    if (scriptNode) {
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.async = true;
+      script.charset = 'UTF-8';
+      
+      const srcMatch = scriptNode.textContent.match(/s1\.src\s*=\s*['"](https:\/\/embed\.tawk\.to\/[^'"]+)['"]/);
+      if (srcMatch && srcMatch[1]) {
+        script.src = srcMatch[1];
+      } else {
+        const srcAttr = scriptNode.getAttribute('src');
+        if (srcAttr) {
+          script.src = srcAttr;
+        } else {
+          script.textContent = scriptNode.textContent;
+        }
+      }
+      document.head.appendChild(script);
+    }
+  } catch (err) {
+    console.error("Failed to dynamically load Tawk script", err);
+  }
+}
+
+function openTawkChat() {
+  if (window.Tawk_API && typeof window.Tawk_API.maximize === 'function') {
+    window.Tawk_API.maximize();
+  } else {
+    alert("Live chat is loading. Please try again in a few seconds.");
+  }
 }

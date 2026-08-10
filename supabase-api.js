@@ -148,12 +148,29 @@ class SupabaseDB {
   }
 
   // ── Ticket Booking Helper Methods ────────────────────
+  // ── Ticket Booking Helper Methods ────────────────────
   async getBookingSettings() {
     try {
       const rows = await this._req('booking_settings', 'GET', null, '?id=eq.1');
-      if (rows && rows.length) return rows[0];
+      if (rows && rows.length) {
+        const r = rows[0];
+        // Ensure default values for toggles if null
+        if (r.whatsapp_enabled === undefined || r.whatsapp_enabled === null) r.whatsapp_enabled = true;
+        if (r.call_enabled === undefined || r.call_enabled === null) r.call_enabled = true;
+        if (r.live_chat_enabled === undefined || r.live_chat_enabled === null) r.live_chat_enabled = true;
+        return r;
+      }
     } catch (e) { console.warn("Failed to load booking settings", e); }
-    return { id: 1, upi_id: 'example@upi', upi_name: 'Kerala Lottery Support', whatsapp_number: '919876543210' };
+    return { 
+      id: 1, 
+      upi_id: 'example@upi', 
+      upi_name: 'Kerala Lottery Support', 
+      whatsapp_number: '919876543210',
+      whatsapp_enabled: true,
+      call_enabled: true,
+      live_chat_enabled: true,
+      tawk_embed_code: ''
+    };
   }
 
   async saveBookingSettings(settings) {
@@ -162,6 +179,10 @@ class SupabaseDB {
       upi_name: settings.upi_name,
       qr_code_url: settings.qr_code_url,
       whatsapp_number: settings.whatsapp_number,
+      whatsapp_enabled: settings.whatsapp_enabled !== false,
+      call_enabled: settings.call_enabled !== false,
+      live_chat_enabled: settings.live_chat_enabled !== false,
+      tawk_embed_code: settings.tawk_embed_code || '',
       updated_at: new Date().toISOString()
     };
     try {
@@ -172,10 +193,72 @@ class SupabaseDB {
         await this._req('booking_settings', 'POST', { id: 1, ...payload });
       }
     } catch (e) {
-      // If table doesn't exist, we fall back gracefully
       console.error(e);
       throw e;
     }
+  }
+
+  // ── Multiple WhatsApp Support Numbers ──
+  async getWhatsappSupportNumbers() {
+    return this._req('support_whatsapp_numbers', 'GET', null, '?order=id.asc');
+  }
+
+  async getActiveWhatsappNumbers() {
+    return this._req('support_whatsapp_numbers', 'GET', null, '?is_active=eq.true&order=id.asc');
+  }
+
+  async saveWhatsappSupportNumber(num) {
+    const payload = {
+      label: num.label,
+      phone_number: num.phone_number,
+      is_active: num.is_active !== false
+    };
+    if (num.id) {
+      return this._req('support_whatsapp_numbers', 'PATCH', payload, `?id=eq.${num.id}`);
+    } else {
+      return this._req('support_whatsapp_numbers', 'POST', payload);
+    }
+  }
+
+  async deleteWhatsappSupportNumber(id) {
+    return this._req('support_whatsapp_numbers', 'DELETE', null, `?id=eq.${id}`);
+  }
+
+  // ── Multiple Call Support Numbers ──
+  async getCallSupportNumbers() {
+    return this._req('support_call_numbers', 'GET', null, '?order=id.asc');
+  }
+
+  async getActiveCallNumbers() {
+    return this._req('support_call_numbers', 'GET', null, '?is_active=eq.true&order=id.asc');
+  }
+
+  async saveCallSupportNumber(num) {
+    const payload = {
+      label: num.label,
+      phone_number: num.phone_number,
+      is_active: num.is_active !== false
+    };
+    if (num.id) {
+      return this._req('support_call_numbers', 'PATCH', payload, `?id=eq.${num.id}`);
+    } else {
+      return this._req('support_call_numbers', 'POST', payload);
+    }
+  }
+
+  async deleteCallSupportNumber(id) {
+    return this._req('support_call_numbers', 'DELETE', null, `?id=eq.${id}`);
+  }
+
+  // ── Round-Robin Assignment Helpers ──
+  async getLastBooking() {
+    try {
+      const rows = await this._req('ticket_bookings', 'GET', null, '?order=created_at.desc,id.desc&limit=1');
+      if (rows && rows.length) return rows[0];
+    } catch (e) {
+      console.warn("Failed to get last booking for assignment", e);
+    }
+    return null;
   }
 
   async getBookingDraws() {
@@ -212,10 +295,7 @@ class SupabaseDB {
     const mappings = ticketIds.map(tid => ({ booking_id: row.id, ticket_id: tid }));
     await this._req('booking_tickets', 'POST', mappings);
     
-    // 3. Move tickets from HELD to SOLD if confirmed, or just keep status updated
-    for (const tid of ticketIds) {
-      await this.updateTicketStatus(tid, 'SOLD', null, null);
-    }
+    // Tickets are kept HELD as set in step 2 until confirmed or rejected.
     return row;
   }
 
@@ -268,8 +348,14 @@ class SupabaseDB {
     const details = await this.getBookingDetails(bookingDbId);
     if (!details) throw new Error("Booking not found");
 
-    // 2. Set booking status
-    await this._req('ticket_bookings', 'PATCH', { status: newStatus, updated_at: new Date().toISOString() }, `?id=eq.${bookingDbId}`);
+    // 2. Set booking status & timestamps
+    const payload = { status: newStatus, updated_at: new Date().toISOString() };
+    if (newStatus === 'CONFIRMED' || newStatus === 'VERIFIED') {
+      payload.confirmed_at = new Date().toISOString();
+    } else if (newStatus === 'REJECTED' || newStatus === 'EXPIRED') {
+      payload.rejected_at = new Date().toISOString();
+    }
+    await this._req('ticket_bookings', 'PATCH', payload, `?id=eq.${bookingDbId}`);
 
     // 3. If REJECTED or EXPIRED, mark tickets as AVAILABLE.
     // If VERIFIED or CONFIRMED, mark tickets as SOLD.

@@ -221,23 +221,42 @@
       <div class="glass-card" style="padding: 40px; text-align: center;">
         <div style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
         <h2 class="gold-gradient" style="font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;">Booking Request Submitted</h2>
-        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 24px;">Your payment details have been successfully uploaded and are pending verification.</p>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 24px;">Your booking has been registered. You can monitor the real-time status below.</p>
         
         <div style="background: rgba(10,46,24,0.6); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 28px;">
           <div class="tb-summary-row"><span>Booking ID:</span><strong id="finalBookingId" class="gold">-</strong></div>
           <div class="tb-summary-row"><span>Booking Date:</span><strong id="finalDrawDate">-</strong></div>
           <div class="tb-summary-row"><span>Selected Tickets:</span><strong id="finalTicketsList" style="word-break: break-all;">-</strong></div>
           <div class="tb-summary-row"><span>Total Amount:</span><strong id="finalTotal">-</strong></div>
-          <div class="tb-summary-row"><span>Status:</span><span class="st st-upcoming" style="padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">Pending Verification</span></div>
+          <div class="tb-summary-row">
+            <span>Status:</span>
+            <span id="finalStatusBadge" class="st st-live" style="padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">
+              Payment Verification Pending
+            </span>
+          </div>
         </div>
 
-        <div class="tb-instructions" style="margin-bottom: 28px; text-align: left;">
-          <p style="margin-bottom: 12px;"><strong>Important Next Step:</strong> Please click the button below to send your booking receipt details to our WhatsApp support team to expedite confirmation.</p>
-        </div>
+        <div style="margin-bottom: 24px; text-align: left;">
+          <h3 class="gold" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 12px; border-left: 3px solid var(--gold); padding-left: 8px;">Need Help? Contact Support</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">Our support team is available via multiple channels. You will communicate with the same dedicated support line.</p>
+          
+          <div style="display: flex; flex-direction: column; gap: 10px;" id="customerSupportChannels">
+            <!-- Button 1: WhatsApp Support -->
+            <button id="custBtnWhatsapp" class="btn-gold-full" style="background: linear-gradient(135deg, #25d366, #128c7e); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; height: 48px; border-radius: 8px;" onclick="sendWhatsAppMessage()">
+              <span style="font-size:1.2rem;">💬</span> Send Booking Details on WhatsApp
+            </button>
 
-        <button class="btn-gold-full" style="background: linear-gradient(135deg, #25d366, #128c7e); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="sendWhatsAppMessage()">
-          <span style="font-size:1.2rem;">💬</span> Send Booking Details on WhatsApp
-        </button>
+            <!-- Button 2: Call Support -->
+            <a id="custBtnCall" href="#" class="btn-gold-full" style="text-decoration: none; background: linear-gradient(135deg, rgba(245,200,66,0.15), rgba(245,200,66,0.06)); border: 1.5px solid rgba(245,200,66,0.3); color: var(--gold); display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; height: 48px; border-radius: 8px;">
+              <span style="font-size:1.2rem;">📞</span> Call Support
+            </a>
+
+            <!-- Button 3: Live Chat -->
+            <button id="custBtnChat" class="btn-gold-full" style="background: linear-gradient(135deg, #007bff, #0056b3); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; height: 48px; border-radius: 8px;" onclick="openTawkChat()">
+              <span style="font-size:1.2rem;">💬</span> Live Chat
+            </button>
+          </div>
+        </div>
 
         <a href="ticket-booking.html" class="bo" style="display: block; text-decoration: none; margin-top: 14px; padding: 12px;">Book More Tickets</a>
       </div>

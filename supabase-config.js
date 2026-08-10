@@ -174,4 +174,45 @@ CREATE POLICY "Anon all ticket_bookings"     ON ticket_bookings  FOR ALL USING (
 CREATE POLICY "Public read booking_tickets"   ON booking_tickets   FOR SELECT USING (true);
 CREATE POLICY "Anon all booking_tickets"      ON booking_tickets   FOR ALL USING (true) WITH CHECK (true);
 
+-- =====================================================
+-- MULTIPLE CHANNELS SUPPORT TABLES
+-- =====================================================
+
+CREATE TABLE support_whatsapp_numbers (
+  id           BIGSERIAL PRIMARY KEY,
+  label        TEXT NOT NULL,
+  phone_number TEXT NOT NULL,
+  is_active    BOOLEAN NOT NULL DEFAULT true,
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE support_call_numbers (
+  id           BIGSERIAL PRIMARY KEY,
+  label        TEXT NOT NULL,
+  phone_number TEXT NOT NULL,
+  is_active    BOOLEAN NOT NULL DEFAULT true,
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE support_whatsapp_numbers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE support_call_numbers ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read support_whatsapp" ON support_whatsapp_numbers FOR SELECT USING (true);
+CREATE POLICY "Anon all support_whatsapp"    ON support_whatsapp_numbers FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Public read support_call"     ON support_call_numbers FOR SELECT USING (true);
+CREATE POLICY "Anon all support_call"        ON support_call_numbers FOR ALL USING (true) WITH CHECK (true);
+
+-- Extensions for settings:
+-- ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS whatsapp_enabled BOOLEAN NOT NULL DEFAULT true;
+-- ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS call_enabled BOOLEAN NOT NULL DEFAULT true;
+-- ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS live_chat_enabled BOOLEAN NOT NULL DEFAULT true;
+-- ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS tawk_embed_code TEXT;
+
+-- Extensions for bookings:
+-- ALTER TABLE ticket_bookings ADD COLUMN IF NOT EXISTS assigned_whatsapp_number TEXT;
+-- ALTER TABLE ticket_bookings ADD COLUMN IF NOT EXISTS assigned_call_number TEXT;
+-- ALTER TABLE ticket_bookings ADD COLUMN IF NOT EXISTS confirmed_at TIMESTAMPTZ;
+-- ALTER TABLE ticket_bookings ADD COLUMN IF NOT EXISTS rejected_at TIMESTAMPTZ;
+
    ===================================================== */

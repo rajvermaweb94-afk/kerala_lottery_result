@@ -78,3 +78,100 @@ VALUES ('Akhil R.','Kochi','₹1,00,00,000','KR 456789',1),
        ('Suresh K.','Kozhikode','₹70,00,000','NR 567890',null);
 
    ===================================================== */
+
+/* =====================================================
+   DAILY RESULTS TABLE (for Daily Result page)
+   Run this SQL in Supabase → SQL Editor → New Query:
+   =====================================================
+
+CREATE TABLE daily_results (
+  id              BIGSERIAL PRIMARY KEY,
+  lottery_name    TEXT NOT NULL,
+  draw_number     TEXT NOT NULL,
+  draw_date       DATE NOT NULL,
+  pdf_url         TEXT,
+  pdf_filename    TEXT,
+  status          TEXT DEFAULT 'draft',  -- draft | published
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE daily_results ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read daily_results" ON daily_results FOR SELECT USING (true);
+CREATE POLICY "Anon all daily_results"    ON daily_results FOR ALL USING (true) WITH CHECK (true);
+
+   ===================================================== */
+
+/* =====================================================
+   TICKET BOOKING SYSTEM TABLES
+   Run this SQL in Supabase → SQL Editor → New Query:
+   =====================================================
+
+CREATE TABLE booking_settings (
+  id                BIGSERIAL PRIMARY KEY,
+  upi_id            TEXT NOT NULL DEFAULT 'example@upi',
+  upi_name          TEXT NOT NULL DEFAULT 'Kerala Lottery',
+  qr_code_url       TEXT,
+  whatsapp_number   TEXT NOT NULL DEFAULT '919876543210',
+  created_at        TIMESTAMPTZ DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Prepopulate one default settings row
+INSERT INTO booking_settings (id, upi_id, upi_name, whatsapp_number)
+VALUES (1, 'example@upi', 'Kerala Lottery Support', '919876543210')
+ON CONFLICT (id) DO NOTHING;
+
+CREATE TABLE ticket_inventory (
+  id              BIGSERIAL PRIMARY KEY,
+  draw_id         BIGINT REFERENCES draws(id) ON DELETE CASCADE,
+  ticket_number   VARCHAR(15) NOT NULL, -- Format 'KL XXXXXX'
+  set_number      INT NOT NULL,          -- 1 to 20
+  status          VARCHAR(20) NOT NULL DEFAULT 'AVAILABLE', -- 'AVAILABLE', 'HELD', 'SOLD'
+  held_until      TIMESTAMPTZ,           -- temp hold expiration time
+  held_by         TEXT,                  -- session id
+  price           NUMERIC DEFAULT 40,
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(draw_id, ticket_number)
+);
+
+CREATE TABLE ticket_bookings (
+  id              BIGSERIAL PRIMARY KEY,
+  booking_id      VARCHAR(20) UNIQUE NOT NULL, -- KB-XXXXXX
+  draw_id         BIGINT REFERENCES draws(id) ON DELETE CASCADE,
+  customer_name   TEXT NOT NULL,
+  mobile_number   TEXT NOT NULL,
+  utr_number      TEXT NOT NULL,
+  screenshot_url  TEXT,                  -- Stores base64 encoded receipt
+  ticket_count    INT NOT NULL,
+  total_amount    NUMERIC NOT NULL,
+  status          VARCHAR(30) NOT NULL DEFAULT 'PENDING PAYMENT', -- PENDING PAYMENT, PAYMENT SUBMITTED, VERIFIED, CONFIRMED, REJECTED, EXPIRED
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE booking_tickets (
+  id            BIGSERIAL PRIMARY KEY,
+  booking_id    BIGINT REFERENCES ticket_bookings(id) ON DELETE CASCADE,
+  ticket_id     BIGINT REFERENCES ticket_inventory(id) ON DELETE CASCADE
+);
+
+ALTER TABLE booking_settings  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ticket_inventory  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ticket_bookings   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE booking_tickets   ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read booking_settings" ON booking_settings FOR SELECT USING (true);
+CREATE POLICY "Anon all booking_settings"    ON booking_settings FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Public read ticket_inventory" ON ticket_inventory FOR SELECT USING (true);
+CREATE POLICY "Anon all ticket_inventory"    ON ticket_inventory FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Public read ticket_bookings"  ON ticket_bookings  FOR SELECT USING (true);
+CREATE POLICY "Anon all ticket_bookings"     ON ticket_bookings  FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Public read booking_tickets"   ON booking_tickets   FOR SELECT USING (true);
+CREATE POLICY "Anon all booking_tickets"      ON booking_tickets   FOR ALL USING (true) WITH CHECK (true);
+
+   ===================================================== */

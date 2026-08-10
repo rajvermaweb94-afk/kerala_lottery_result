@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Results – Kerala Lottery Premium</title>
+  <meta name="description" content="Download the latest Kerala lottery daily results instantly. Browse, search, and download official result PDFs." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<!-- FLOATING PARTICLES -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- LIVE TICKER -->
+<div class="ticker-wrap">
+  <span class="live-dot"></span>
+  <span class="live-label">LIVE</span>
+  <div class="ticker-track">
+    <span class="ticker-item">🏆 Karunya KR-702 Result Published &nbsp;|&nbsp; 1st Prize ₹1 Crore &nbsp;|&nbsp; Next Draw at 3 PM &nbsp;|&nbsp; Nirmal NR-389 Result Out &nbsp;|&nbsp; Win-Win W-780 Published &nbsp;|&nbsp; Akshaya AK-651 Result Live &nbsp;|&nbsp; Karunya Plus KN-570 Result Out &nbsp;|&nbsp; Sthree Sakthi SS-420 Published &nbsp;|&nbsp;</span>
+    <span class="ticker-item">🏆 Karunya KR-702 Result Published &nbsp;|&nbsp; 1st Prize ₹1 Crore &nbsp;|&nbsp; Next Draw at 3 PM &nbsp;|&nbsp; Nirmal NR-389 Result Out &nbsp;|&nbsp; Win-Win W-780 Published &nbsp;|&nbsp; Akshaya AK-651 Result Live &nbsp;|&nbsp; Karunya Plus KN-570 Result Out &nbsp;|&nbsp; Sthree Sakthi SS-420 Published &nbsp;|&nbsp;</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="container nav-container">
+    <a href="index.html" class="logo" style="text-decoration:none">
+      <div class="logo-icon">🎰</div>
+      <div>
+        <span class="logo-text">Kerala<span class="gold">Lottery</span></span>
+        <span class="logo-sub">Premium Result Platform</span>
+      </div>
+    </a>
+    <nav class="desktop-nav">
+      <a href="index.html#home" class="nav-link">Home</a>
+      <a href="index.html#results" class="nav-link">Results</a>
+      <a href="index.html#winners" class="nav-link">Winners</a>
+      <a href="index.html#history" class="nav-link">History</a>
+    </nav>
+    <div class="nav-actions">
+      <span class="live-badge"><span class="pulse-dot"></span> Live</span>
+      <a href="daily-result.html" class="btn-gold" style="text-decoration:none;display:inline-block;color:#030f0a">Daily Result</a>
+      <a href="ticket-booking.html" class="btn-gold highlight-booking" style="text-decoration:none;display:inline-block;margin-left:8px">🎟 Ticket Booking</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html#home" class="mob-link">Home</a>
+    <a href="index.html#results" class="mob-link">Results</a>
+    <a href="index.html#winners" class="mob-link">Winners</a>
+    <a href="index.html#history" class="mob-link">History</a>
+    <a href="daily-result.html" class="mob-link">Daily Result</a>
+    <a href="ticket-booking.html" class="mob-link" style="color:var(--gold)">🎟 Ticket Booking</a>
+  </div>
+</header>
+
+<!-- PAGE CONTENT -->
+<main class="dr-page">
+
+  <!-- PAGE TITLE -->
+  <section class="dr-hero">
+    <div class="container">
+      <div class="dr-hero-inner">
+        <span class="section-tag">Daily Results</span>
+        <h1 class="dr-title">Daily Kerala Lottery <span class="gold-gradient">Results</span></h1>
+        <p class="dr-subtitle">Download the latest Kerala lottery results instantly.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEARCH + FILTER -->
+  <section class="dr-controls-section">
+    <div class="container">
+      <div class="dr-controls glass-card">
+        <div class="dr-search-wrap">
+          <i data-lucide="search"></i>
+          <input type="text" id="drSearch" class="dr-search-input" placeholder="Search lottery or draw number..." oninput="handleDrSearch()" />
+        </div>
+        <div class="dr-filter-tabs">
+          <button class="dr-filter-btn active" data-filter="all" onclick="setDrFilter('all', this)">All Results</button>
+          <button class="dr-filter-btn" data-filter="today" onclick="setDrFilter('today', this)">Today</button>
+          <button class="dr-filter-btn" data-filter="week" onclick="setDrFilter('week', this)">This Week</button>
+          <button class="dr-filter-btn" data-filter="month" onclick="setDrFilter('month', this)">This Month</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS TABLE -->
+  <section class="dr-results-section">
+    <div class="container">
+      <div class="dr-results-card glass-card">
+        <!-- Loading skeleton -->
+        <div id="drLoading" class="dr-loading">
+          <div class="dr-skeleton-row"><div class="skeleton" style="height:18px;width:30px"></div><div class="skeleton" style="height:18px;width:45%"></div><div class="skeleton" style="height:18px;width:20%"></div><div class="skeleton" style="height:34px;width:110px;border-radius:8px"></div></div>
+          <div class="dr-skeleton-row"><div class="skeleton" style="height:18px;width:30px"></div><div class="skeleton" style="height:18px;width:40%"></div><div class="skeleton" style="height:18px;width:22%"></div><div class="skeleton" style="height:34px;width:110px;border-radius:8px"></div></div>
+          <div class="dr-skeleton-row"><div class="skeleton" style="height:18px;width:30px"></div><div class="skeleton" style="height:18px;width:38%"></div><div class="skeleton" style="height:18px;width:18%"></div><div class="skeleton" style="height:34px;width:110px;border-radius:8px"></div></div>
+          <div class="dr-skeleton-row"><div class="skeleton" style="height:18px;width:30px"></div><div class="skeleton" style="height:18px;width:42%"></div><div class="skeleton" style="height:18px;width:20%"></div><div class="skeleton" style="height:34px;width:110px;border-radius:8px"></div></div>
+          <div class="dr-skeleton-row"><div class="skeleton" style="height:18px;width:30px"></div><div class="skeleton" style="height:18px;width:35%"></div><div class="skeleton" style="height:18px;width:24%"></div><div class="skeleton" style="height:34px;width:110px;border-radius:8px"></div></div>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="dr-table-wrap" id="drTableWrap" style="display:none">
+          <table class="dr-table" id="drTable">
+            <thead>
+              <tr>
+                <th>SL No.</th>
+                <th>Lottery / Draw</th>
+                <th>Draw Date</th>
+                <th>Download</th>
+              </tr>
+            </thead>
+            <tbody id="drTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="dr-cards-wrap" id="drCardsWrap" style="display:none"></div>
+
+        <!-- Empty State -->
+        <div id="drEmpty" class="dr-empty" style="display:none">
+          <div class="dr-empty-icon">📄</div>
+          <p class="dr-empty-text">No daily results available.</p>
+          <p class="dr-empty-sub">Try adjusting your search or filter criteria.</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="dr-pagination" id="drPagination" style="display:none"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-top-line"></div>
+  <div class="container">
+
+    <!-- Row 1: Quick links -->
+    <nav class="footer-links">
+      <a href="index.html#home" class="footer-link">Home</a>
+      <span class="footer-dot">•</span>
+      <a href="index.html#results" class="footer-link">Results</a>
+      <span class="footer-dot">•</span>
+      <a href="index.html#winners" class="footer-link">Winners</a>
+      <span class="footer-dot">•</span>
+      <a href="index.html#history" class="footer-link">History</a>
+      <span class="footer-dot">•</span>
+      <a href="daily-result.html" class="footer-link" style="color:var(--gold)">Daily Result</a>
+      <span class="footer-dot">•</span>
+      <a href="#" class="footer-link">Contact</a>
+    </nav>
+
+    <!-- Row 2: Disclaimer -->
+    <p class="footer-disclaimer-text">
+      Independent Kerala lottery result platform. Verify results with official sources before claiming prizes.
+    </p>
+
+    <!-- Row 3: Bottom bar -->
+    <div class="footer-bottom">
+      <span>© 2026 KeralaLottery Premium</span>
+      <span class="footer-live">
+        <span class="footer-live-dot"></span> Live Platform
+      </span>
+    </div>
+
+  </div>
+</footer>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav">
+  <a href="index.html#home" class="mob-nav-item">
+    <i data-lucide="home"></i><span>Home</span>
+  </a>
+  <a href="daily-result.html" class="mob-nav-item active">
+    <i data-lucide="file-text"></i><span>Daily</span>
+  </a>
+  <a href="index.html#results" class="mob-nav-item">
+    <i data-lucide="trophy"></i><span>Results</span>
+  </a>
+  <a href="index.html#winners" class="mob-nav-item">
+    <i data-lucide="star"></i><span>Winners</span>
+  </a>
+</nav>
+
+<!-- FLOATING SUPPORT BUTTONS -->
+<div class="floating-support">
+  <a href="https://wa.me/919876543210" class="float-btn whatsapp" title="WhatsApp Support" target="_blank">
+    <span class="float-icon">💬</span>
+  </a>
+  <a href="https://t.me/keralalottery" class="float-btn telegram" title="Telegram Channel" target="_blank">
+    <span class="float-icon">✈️</span>
+  </a>
+  <button class="float-btn support" title="Live Support" onclick="alert('Support chat coming soon!')">
+    <span class="float-icon">🎧</span>
+  </button>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="supabase-api.js"></script>
+<script src="daily-result.js"></script>
+</body>
+</html>

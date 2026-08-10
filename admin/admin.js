@@ -53,13 +53,15 @@ document.addEventListener('DOMContentLoaded', () => {
 function go(page) {
   document.querySelectorAll('.nav-item').forEach(a =>
     a.classList.toggle('active', a.dataset.page === page));
-  const titles = { dashboard:'Dashboard', draws:'Manage Results', winners:'Winners', settings:'Settings' };
+  const titles = { dashboard:'Dashboard', draws:'Manage Results', winners:'Winners', bookings:'Ticket Bookings', inventory:'Ticket Inventory', settings:'Settings' };
   document.getElementById('pageTitle').textContent = titles[page] || page;
   const mc = document.getElementById('mainContent');
   mc.innerHTML = '<div class="page"><div class="empty"><div class="empty-i">⏳</div>Loading…</div></div>';
   if (page === 'dashboard') pageDashboard();
   else if (page === 'draws')   pageDraws();
   else if (page === 'winners') pageWinners();
+  else if (page === 'bookings') pageBookings();
+  else if (page === 'inventory') pageInventory();
   else if (page === 'settings') pageSettings();
 }
 
@@ -270,6 +272,7 @@ async function saveDraw() {
   try {
     const db = getDB();
     let drawId = editDrawId;
+    const isNew = !editDrawId;
     if (editDrawId) {
       await db.updateDraw(editDrawId, drawData);
     } else {
@@ -277,7 +280,32 @@ async function saveDraw() {
       drawId = row.id;
     }
     await db.replacePrizes(drawId, prizes);
-    toast(editDrawId ? 'Draw updated ✅' : 'Draw added ✅', 's');
+    
+    // Auto-generate 200 unique tickets for new draw
+    if (isNew) {
+      const tickets = [];
+      const numbers = new Set();
+      for (let setNum = 1; setNum <= 20; setNum++) {
+        for (let i = 0; i < 10; i++) {
+          let randNum;
+          do {
+            randNum = Math.floor(100000 + Math.random() * 900000).toString();
+          } while (numbers.has(randNum));
+          numbers.add(randNum);
+          
+          tickets.push({
+            draw_id: drawId,
+            ticket_number: `KL ${randNum}`,
+            set_number: setNum,
+            status: 'AVAILABLE',
+            price: 40
+          });
+        }
+      }
+      await db.insertDrawTickets(tickets);
+    }
+    
+    toast(editDrawId ? 'Draw updated ✅' : 'Draw added and 200 tickets generated ✅', 's');
     closeModal('drawModal');
     pageDraws();
   } catch(e) { toast(e.message, 'e'); }
@@ -362,40 +390,380 @@ async function delWinner(id) {
   } catch(e) { toast(e.message,'e'); }
 }
 
+// ── Variables for booking pagination & filters ─────────
+let bSearch = '', bStatus = '', bPage = 1;
+let iSelectedDrawId = null;
+let iSetFilter = '';
+let iStatusFilter = '';
+let iSearchQuery = '';
+
 // ════════════════════════════════════════════════════════
 //  SETTINGS
 // ════════════════════════════════════════════════════════
-function pageSettings() {
-  document.getElementById('mainContent').innerHTML = `
-  <div class="page">
-    <div class="ph"><h2>Settings</h2></div>
-    <div class="gc" style="max-width:500px">
-      <div class="gc-head"><span class="gc-title">Change Admin Password</span></div>
-      <div class="gc-body">
-        <p style="font-size:.85rem;color:var(--text2);margin-bottom:18px;line-height:1.6">
-          The admin password is stored in <strong style="color:#e8f5e9">supabase-config.js</strong>.
-          Edit that file and change the <code style="color:var(--gold)">ADMIN_PASSWORD</code> value,
-          then re-deploy to GitHub.
-        </p>
-        <div style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);
-          border-radius:10px;padding:16px;font-size:.85rem;color:var(--text2)">
-          <code style="color:var(--gold)">const ADMIN_PASSWORD = 'your-new-password';</code>
+async function pageSettings() {
+  const mc = document.getElementById('mainContent');
+  mc.innerHTML = '<div class="page"><div class="empty"><div class="empty-i">⏳</div>Loading Settings…</div></div>';
+  try {
+    const db = getDB();
+    const settings = await db.getBookingSettings();
+    mc.innerHTML = `
+    <div class="page">
+      <div class="ph"><h2>Settings</h2></div>
+      
+      <!-- Booking settings -->
+      <div class="gc" style="max-width:550px; margin-bottom: 24px;">
+        <div class="gc-head"><span class="gc-title">Ticket Booking Settings</span></div>
+        <div class="gc-body">
+          <form id="bookingSettingsForm" onsubmit="saveBookingSettingsForm(event)">
+            <div class="fg" style="margin-bottom:12px;">
+              <label class="fl">UPI ID</label>
+              <input class="fi" id="s_upi_id" value="${settings.upi_id || ''}" placeholder="e.g. example@upi" required />
+            </div>
+            <div class="fg" style="margin-bottom:12px;">
+              <label class="fl">Payee / Display Name</label>
+              <input class="fi" id="s_upi_name" value="${settings.upi_name || ''}" placeholder="e.g. Kerala Lottery" required />
+            </div>
+            <div class="fg" style="margin-bottom:12px;">
+              <label class="fl">WhatsApp Support Number (e.g. 919876543210)</label>
+              <input class="fi" id="s_whatsapp" value="${settings.whatsapp_number || ''}" placeholder="e.g. 919876543210" required />
+            </div>
+            <div class="fg" style="margin-bottom:16px;">
+              <label class="fl">Upload UPI QR Code Image</label>
+              <input type="file" class="fi" id="s_qr_file" accept="image/*" style="padding: 8px;" />
+              ${settings.qr_code_url ? `<div style="margin-top:10px;"><img src="${settings.qr_code_url}" style="max-height:120px; border:1px solid rgba(245,200,66,0.2); border-radius:6px; background:#fff; padding:4px;" /></div>` : ''}
+            </div>
+            <button type="submit" class="bp" id="s_save_btn">💾 Save Booking Settings</button>
+          </form>
         </div>
       </div>
-    </div>
-    <div class="gc" style="max-width:500px;margin-top:20px">
-      <div class="gc-head"><span class="gc-title">Supabase Info</span></div>
-      <div class="gc-body" style="display:flex;flex-direction:column;gap:12px;font-size:.85rem;color:var(--text2)">
-        <div>🌐 Project URL: <strong style="color:#e8f5e9;word-break:break-all">${SUPABASE_URL}</strong></div>
-        <div>🗄️ Database: <strong style="color:#e8f5e9">PostgreSQL (Supabase)</strong></div>
-        <div>🚀 Hosting: <strong style="color:#e8f5e9">GitHub + Netlify (static)</strong></div>
-        <div>📦 Version: <strong style="color:#e8f5e9">2.0.0 Supabase Edition</strong></div>
-        <div style="margin-top:8px">
-          <a href="https://supabase.com/dashboard" target="_blank" class="bo bsm">Open Supabase Dashboard →</a>
+
+      <div class="gc" style="max-width:550px; margin-bottom: 24px;">
+        <div class="gc-head"><span class="gc-title">Change Admin Password</span></div>
+        <div class="gc-body">
+          <p style="font-size:.85rem;color:var(--text2);margin-bottom:18px;line-height:1.6">
+            The admin password is stored in <strong style="color:#e8f5e9">supabase-config.js</strong>.
+            Edit that file and change the <code style="color:var(--gold)">ADMIN_PASSWORD</code> value,
+            then re-deploy.
+          </p>
+          <div style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);
+            border-radius:10px;padding:16px;font-size:.85rem;color:var(--text2)">
+            <code style="color:var(--gold)">const ADMIN_PASSWORD = 'your-new-password';</code>
+          </div>
         </div>
       </div>
-    </div>
-  </div>`;
+      <div class="gc" style="max-width:550px">
+        <div class="gc-head"><span class="gc-title">Supabase Info</span></div>
+        <div class="gc-body" style="display:flex;flex-direction:column;gap:12px;font-size:.85rem;color:var(--text2)">
+          <div>🌐 Project URL: <strong style="color:#e8f5e9;word-break:break-all">${SUPABASE_URL}</strong></div>
+          <div>🗄️ Database: <strong style="color:#e8f5e9">PostgreSQL (Supabase)</strong></div>
+          <div>🚀 Hosting: <strong style="color:#e8f5e9">GitHub + Netlify (static)</strong></div>
+          <div>📦 Version: <strong style="color:#e8f5e9">2.0.0 Supabase Edition</strong></div>
+          <div style="margin-top:8px">
+            <a href="https://supabase.com/dashboard" target="_blank" class="bo bsm">Open Supabase Dashboard →</a>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  } catch (e) {
+    showError(e);
+  }
+}
+
+async function saveBookingSettingsForm(e) {
+  e.preventDefault();
+  const btn = document.getElementById('s_save_btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  
+  const upiId = document.getElementById('s_upi_id').value.trim();
+  const upiName = document.getElementById('s_upi_name').value.trim();
+  const whatsapp = document.getElementById('s_whatsapp').value.trim();
+  const qrFile = document.getElementById('s_qr_file').files[0];
+  
+  let qrBase64 = null;
+  if (qrFile) {
+    try {
+      qrBase64 = await new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result);
+        r.onerror = reject;
+        r.readAsDataURL(qrFile);
+      });
+    } catch (err) {
+      toast("Error parsing QR image", "e");
+      btn.disabled = false;
+      btn.textContent = 'Save Booking Settings';
+      return;
+    }
+  }
+
+  try {
+    const db = getDB();
+    const current = await db.getBookingSettings();
+    const payload = {
+      upi_id: upiId,
+      upi_name: upiName,
+      whatsapp_number: whatsapp,
+      qr_code_url: qrBase64 || current.qr_code_url
+    };
+    await db.saveBookingSettings(payload);
+    toast("Booking settings saved successfully! ✅", "s");
+    pageSettings();
+  } catch (err) {
+    toast(err.message, "e");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Booking Settings';
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  TICKET BOOKINGS MANAGEMENT
+// ════════════════════════════════════════════════════════
+async function pageBookings() {
+  try {
+    const db = getDB();
+    const data = await db.getBookings({ search: bSearch, status: bStatus, page: bPage });
+    document.getElementById('mainContent').innerHTML = `
+    <div class="page">
+      <div class="ph"><h2>Manage Ticket Bookings</h2></div>
+      <div class="cb">
+        <input class="si" placeholder="Search by customer name, mobile, ID, UTR…" value="${bSearch}"
+          oninput="bSearch=this.value;bPage=1;pageBookings()"/>
+        <select class="sf" onchange="bStatus=this.value;bPage=1;pageBookings()">
+          <option value="" ${!bStatus?'selected':''}>All Statuses</option>
+          <option value="PENDING PAYMENT" ${bStatus==='PENDING PAYMENT'?'selected':''}>PENDING PAYMENT</option>
+          <option value="PAYMENT SUBMITTED" ${bStatus==='PAYMENT SUBMITTED'?'selected':''}>PAYMENT SUBMITTED</option>
+          <option value="VERIFIED" ${bStatus==='VERIFIED'?'selected':''}>VERIFIED</option>
+          <option value="CONFIRMED" ${bStatus==='CONFIRMED'?'selected':''}>CONFIRMED</option>
+          <option value="REJECTED" ${bStatus==='REJECTED'?'selected':''}>REJECTED</option>
+          <option value="EXPIRED" ${bStatus==='EXPIRED'?'selected':''}>EXPIRED</option>
+        </select>
+      </div>
+      <div class="gc"><div class="tw"><table>
+        <thead><tr><th>Booking ID</th><th>Customer Name</th><th>Mobile (WhatsApp)</th><th>Count</th><th>Total</th><th>UTR</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${data.rows.length ? data.rows.map(r => `
+          <tr>
+            <td><strong style="color:#e8f5e9">${r.booking_id}</strong></td>
+            <td>${r.customer_name}</td>
+            <td>${r.mobile_number}</td>
+            <td>${r.ticket_count}</td>
+            <td><strong style="color:var(--gold)">₹${r.total_amount}</strong></td>
+            <td class="tg">${r.utr_number}</td>
+            <td><span class="st st-${getStatusClass(r.status)}">${r.status}</span></td>
+            <td><div class="flex">
+              <button class="bo bsm" onclick="viewBookingDetails(${r.id})">👁 View</button>
+              ${r.status === 'PAYMENT SUBMITTED' || r.status === 'PENDING PAYMENT' ? `
+                <button class="bg bsm" onclick="setBookingStatus(${r.id},'CONFIRMED')">✓ Confirm</button>
+                <button class="bd bsm" onclick="setBookingStatus(${r.id},'REJECTED')">✕ Reject</button>
+              ` : ''}
+              ${r.status === 'CONFIRMED' ? `
+                <button class="bo bsm" onclick="setBookingStatus(${r.id},'REJECTED')" style="border-color:rgba(255,68,68,0.3);color:#ff8080;">✕ Reject</button>
+              ` : ''}
+              ${r.status === 'REJECTED' ? `
+                <button class="bo bsm" onclick="setBookingStatus(${r.id},'CONFIRMED')" style="border-color:rgba(0,255,136,0.3);color:#00ff88;">✓ Confirm</button>
+              ` : ''}
+            </div></td>
+          </tr>`).join('') : '<tr><td colspan="8"><div class="empty"><div class="empty-i">📭</div>No bookings found</div></td></tr>'}
+        </tbody>
+      </table></div>
+      ${data.total > 15 ? `<div style="display:flex;gap:8px;justify-content:center;padding:16px">
+        ${Array.from({length:Math.ceil(data.total/15)},(_,i)=>`
+          <button class="bo bsm ${bPage===i+1?'bp':''}" onclick="bPage=${i+1};pageBookings()">${i+1}</button>`).join('')}
+      </div>` : ''}
+      </div>
+    </div>`;
+  } catch(e) { showError(e); }
+}
+
+function getStatusClass(st) {
+  if (st === 'CONFIRMED' || st === 'VERIFIED') return 'published';
+  if (st === 'PAYMENT SUBMITTED') return 'live';
+  if (st === 'REJECTED' || st === 'EXPIRED') return 'upcoming'; // Red/dark style
+  return 'upcoming';
+}
+
+async function setBookingStatus(id, newStatus) {
+  const word = newStatus === 'CONFIRMED' ? 'Confirm booking?' : 'Reject booking and release tickets?';
+  if (!confirm(word)) return;
+  try {
+    await getDB().updateBookingStatusAndRelease(id, newStatus);
+    toast(`Booking status updated to ${newStatus} ✅`, 's');
+    pageBookings();
+  } catch (e) {
+    toast(e.message, 'e');
+  }
+}
+
+async function viewBookingDetails(id) {
+  try {
+    const details = await getDB().getBookingDetails(id);
+    if (!details) return;
+
+    // Show details in draws modal temporarily for simplicity
+    document.getElementById('modalTitle').textContent = `Booking ID: ${details.booking.booking_id}`;
+    
+    const tNumbers = details.tickets.map(t => t.ticket_number).join(', ');
+    
+    document.getElementById('modalBody').innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:16px; font-size:.9rem; line-height:1.6; color:var(--text2)">
+        <div><strong>Customer Name:</strong> <span style="color:#fff">${details.booking.customer_name}</span></div>
+        <div><strong>Mobile (WhatsApp):</strong> <span style="color:#fff">${details.booking.mobile_number}</span></div>
+        <div><strong>UTR Number / Reference ID:</strong> <span style="color:var(--gold); font-weight:700">${details.booking.utr_number}</span></div>
+        <div><strong>Draw Date:</strong> <span style="color:#fff">${details.draw ? details.draw.draw_name + ' (' + details.draw.draw_number + ') — ' + details.draw.draw_date : '-'}</span></div>
+        <div><strong>Tickets:</strong> <span style="color:var(--gold); font-weight:700; word-break:break-all">${tNumbers}</span></div>
+        <div><strong>Ticket Count:</strong> <span style="color:#fff">${details.booking.ticket_count}</span></div>
+        <div><strong>Total Price:</strong> <span style="color:var(--gold)">₹${details.booking.total_amount}</span></div>
+        <div><strong>Status:</strong> <span class="st st-${getStatusClass(details.booking.status)}">${details.booking.status}</span></div>
+        
+        <div><strong>Payment Screenshot Receipt:</strong></div>
+        ${details.booking.screenshot_url ? `
+          <div class="screenshot-preview-container">
+            <img src="${details.booking.screenshot_url}" class="screenshot-preview-img" alt="Receipt Screenshot" />
+          </div>
+        ` : `
+          <div style="background:rgba(255,255,255,0.03); border:1px dashed var(--glass-border); padding: 24px; text-align:center; border-radius:8px">
+            No screenshot uploaded.
+          </div>
+        `}
+        
+        <div class="mf" style="margin-top:16px">
+          <button class="bo" onclick="closeModal('drawModal')">Close</button>
+          ${details.booking.status === 'PAYMENT SUBMITTED' || details.booking.status === 'PENDING PAYMENT' ? `
+            <button class="bg" onclick="closeModal('drawModal'); setBookingStatus(${details.booking.id},'CONFIRMED')">✓ Confirm Payment</button>
+            <button class="bd" onclick="closeModal('drawModal'); setBookingStatus(${details.booking.id},'REJECTED')">✕ Reject</button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('drawModal').classList.remove('hidden');
+  } catch (err) {
+    toast(err.message, 'e');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  TICKET INVENTORY MANAGEMENT
+// ════════════════════════════════════════════════════════
+async function pageInventory() {
+  try {
+    const db = getDB();
+    const draws = await db.getBookingDraws();
+    
+    if (!draws.length) {
+      document.getElementById('mainContent').innerHTML = `
+        <div class="page">
+          <div class="ph"><h2>Ticket Inventory</h2></div>
+          <div class="empty"><div class="empty-i">📭</div>No draw dates found. Please add a Draw first.</div>
+        </div>`;
+      return;
+    }
+
+    if (!iSelectedDrawId) {
+      iSelectedDrawId = draws[0].id;
+    }
+
+    // Fetch tickets for this draw
+    const tickets = await db.getDrawTickets(iSelectedDrawId);
+    
+    // Stats calculation
+    const totalCount = tickets.length;
+    const availCount = tickets.filter(t => t.status === 'AVAILABLE').length;
+    const heldCount  = tickets.filter(t => t.status === 'HELD').length;
+    const soldCount  = tickets.filter(t => t.status === 'SOLD').length;
+
+    // Filter tickets array locally for list
+    let filteredTickets = tickets.filter(t => {
+      // Set filter
+      if (iSetFilter && t.set_number != iSetFilter) return false;
+      // Status filter
+      if (iStatusFilter && t.status !== iStatusFilter) return false;
+      // Ticket number search query
+      if (iSearchQuery && !t.ticket_number.toLowerCase().includes(iSearchQuery.toLowerCase())) return false;
+      return true;
+    });
+
+    document.getElementById('mainContent').innerHTML = `
+    <div class="page">
+      <div class="ph"><h2>Ticket Inventory</h2></div>
+      
+      <!-- Selector bar -->
+      <div class="cb" style="justify-content: flex-start; gap: 16px;">
+        <div class="fg" style="margin: 0; min-width: 250px;">
+          <select class="fs" id="inventoryDrawSelector" onchange="iSelectedDrawId=this.value;pageInventory()">
+            ${draws.map(d => `<option value="${d.id}" ${iSelectedDrawId == d.id ? 'selected':''}>${d.draw_name} (${d.draw_number}) — ${d.draw_date}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid" style="margin-bottom: 24px;">
+        <div class="stat-card" style="padding:16px 20px;"><div class="stat-lbl" style="font-size:0.75rem;">Total Inventory</div><div class="stat-val" style="font-size:1.6rem;">${totalCount}</div></div>
+        <div class="stat-card" style="padding:16px 20px;"><div class="stat-lbl" style="font-size:0.75rem;color:#00ff88;">Available</div><div class="stat-val" style="font-size:1.6rem;color:#00ff88;">${availCount}</div></div>
+        <div class="stat-card" style="padding:16px 20px;"><div class="stat-lbl" style="font-size:0.75rem;color:var(--gold);">Held (Locked)</div><div class="stat-val" style="font-size:1.6rem;color:var(--gold);">${heldCount}</div></div>
+        <div class="stat-card" style="padding:16px 20px;"><div class="stat-lbl" style="font-size:0.75rem;color:#ff8080;">Sold</div><div class="stat-val" style="font-size:1.6rem;color:#ff8080;">${soldCount}</div></div>
+      </div>
+
+      <!-- Filters -->
+      <div class="cb">
+        <input class="si" style="max-width: 240px;" placeholder="Search ticket like 'KL 123456'…" value="${iSearchQuery}"
+          oninput="iSearchQuery=this.value;pageInventory()"/>
+        
+        <select class="sf" onchange="iSetFilter=this.value;pageInventory()">
+          <option value="" ${!iSetFilter ? 'selected':''}>All Sets</option>
+          ${Array.from({length:20},(_,idx)=>`<option value="${idx+1}" ${iSetFilter == idx+1 ? 'selected':''}>Set ${String(idx+1).padStart(2,'0')}</option>`).join('')}
+        </select>
+
+        <select class="sf" onchange="iStatusFilter=this.value;pageInventory()">
+          <option value="" ${!iStatusFilter ? 'selected':''}>All Statuses</option>
+          <option value="AVAILABLE" ${iStatusFilter==='AVAILABLE'?'selected':''}>AVAILABLE</option>
+          <option value="HELD" ${iStatusFilter==='HELD'?'selected':''}>HELD</option>
+          <option value="SOLD" ${iStatusFilter==='SOLD'?'selected':''}>SOLD</option>
+        </select>
+      </div>
+
+      <div class="gc"><div class="tw"><table>
+        <thead><tr><th>Ticket Number</th><th>Set</th><th>Price</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>${filteredTickets.length ? filteredTickets.map(t => `
+          <tr>
+            <td><strong style="color:#e8f5e9; font-size:1rem; letter-spacing:0.5px;">${t.ticket_number}</strong></td>
+            <td>Set ${String(t.set_number).padStart(2, '0')}</td>
+            <td>₹${t.price}</td>
+            <td><span class="st st-${t.status === 'AVAILABLE' ? 'published' : t.status === 'HELD' ? 'live' : 'upcoming'}">${t.status}</span></td>
+            <td>
+              ${t.status !== 'AVAILABLE' ? `
+                <button class="bo bsm" onclick="adminReleaseTicket(${t.id})">🔓 Mark Available</button>
+              ` : `<button class="bd bsm" onclick="adminMarkTicketSold(${t.id})">🎟 Mark Sold</button>`}
+            </td>
+          </tr>`).join('') : '<tr><td colspan="5"><div class="empty"><div class="empty-i">📭</div>No matching tickets</div></td></tr>'}
+        </tbody>
+      </table></div></div>
+    </div>`;
+
+  } catch(e) { showError(e); }
+}
+
+async function adminReleaseTicket(ticketId) {
+  if (!confirm('Mark this ticket as AVAILABLE?')) return;
+  try {
+    await getDB().updateTicketStatus(ticketId, 'AVAILABLE');
+    toast('Ticket marked as AVAILABLE ✅', 's');
+    pageInventory();
+  } catch (e) {
+    toast(e.message, 'e');
+  }
+}
+
+async function adminMarkTicketSold(ticketId) {
+  if (!confirm('Mark this ticket as SOLD?')) return;
+  try {
+    await getDB().updateTicketStatus(ticketId, 'SOLD');
+    toast('Ticket marked as SOLD ✅', 's');
+    pageInventory();
+  } catch (e) {
+    toast(e.message, 'e');
+  }
 }
 
 // ── Error helper ─────────────────────────────────────────

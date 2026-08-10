@@ -12,6 +12,16 @@
   to   = "/admin/:splat"
   status = 200
 
+[[redirects]]
+  from = "/daily-result"
+  to   = "/daily-result.html"
+  status = 200
+
+[[redirects]]
+  from = "/ticket-booking"
+  to   = "/ticket-booking.html"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ticket Booking – Kerala Lottery Premium</title>
+  <meta name="description" content="Select your premium Kerala Lottery tickets, complete payment via UPI, and submit details for confirmation." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<!-- FLOATING PARTICLES -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- LIVE TICKER -->
+<div class="ticker-wrap">
+  <span class="live-dot"></span>
+  <span class="live-label">LIVE</span>
+  <div class="ticker-track">
+    <span class="ticker-item">🏆 Karunya KR-702 Result Published &nbsp;|&nbsp; 1st Prize ₹1 Crore &nbsp;|&nbsp; Next Draw at 3 PM &nbsp;|&nbsp; Nirmal NR-389 Result Out &nbsp;|&nbsp; Win-Win W-780 Published &nbsp;|&nbsp; Akshaya AK-651 Result Live &nbsp;|&nbsp; Karunya Plus KN-570 Result Out &nbsp;|&nbsp; Sthree Sakthi SS-420 Published &nbsp;|&nbsp;</span>
+    <span class="ticker-item">🏆 Karunya KR-702 Result Published &nbsp;|&nbsp; 1st Prize ₹1 Crore &nbsp;|&nbsp; Next Draw at 3 PM &nbsp;|&nbsp; Nirmal NR-389 Result Out &nbsp;|&nbsp; Win-Win W-780 Published &nbsp;|&nbsp; Akshaya AK-651 Result Live &nbsp;|&nbsp; Karunya Plus KN-570 Result Out &nbsp;|&nbsp; Sthree Sakthi SS-420 Published &nbsp;|&nbsp;</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="container nav-container">
+    <a href="index.html" class="logo" style="text-decoration:none">
+      <div class="logo-icon">🎰</div>
+      <div>
+        <span class="logo-text">Kerala<span class="gold">Lottery</span></span>
+        <span class="logo-sub">Premium Result Platform</span>
+      </div>
+    </a>
+    <nav class="desktop-nav">
+      <a href="index.html#home" class="nav-link">Home</a>
+      <a href="index.html#results" class="nav-link">Results</a>
+      <a href="index.html#winners" class="nav-link">Winners</a>
+      <a href="index.html#history" class="nav-link">History</a>
+    </nav>
+    <div class="nav-actions">
+      <span class="live-badge"><span class="pulse-dot"></span> Live</span>
+      <a href="daily-result.html" class="btn-gold" style="text-decoration:none;display:inline-block">Daily Result</a>
+      <a href="ticket-booking.html" class="btn-gold highlight-booking" style="text-decoration:none;display:inline-block;margin-left:8px;color:#030f0a">🎟 Ticket Booking</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html#home" class="mob-link">Home</a>
+    <a href="index.html#results" class="mob-link">Results</a>
+    <a href="index.html#winners" class="mob-link">Winners</a>
+    <a href="index.html#history" class="mob-link">History</a>
+    <a href="daily-result.html" class="mob-link">Daily Result</a>
+    <a href="ticket-booking.html" class="mob-link" style="color:var(--gold)">🎟 Ticket Booking</a>
+  </div>
+</header>
+
+<!-- MAIN BOOKING PAGE CONTENT -->
+<main class="dr-page">
+
+  <!-- PAGE HERO -->
+  <section class="dr-hero">
+    <div class="container">
+      <div class="dr-hero-inner">
+        <span class="section-tag">Premium Booking</span>
+        <h1 class="dr-title">Kerala Ticket <span class="gold-gradient">Booking</span></h1>
+        <p class="dr-subtitle">Choose your preferred tickets and continue to payment.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP PROGRESS INDICATOR -->
+  <section style="margin-bottom: 24px;">
+    <div class="container">
+      <div class="tb-steps glass-card">
+        <div class="tb-step active" id="stepIndicator1">
+          <span class="tb-step-num">1</span>
+          <span class="tb-step-text">Select Tickets</span>
+        </div>
+        <div class="tb-step-line"></div>
+        <div class="tb-step" id="stepIndicator2">
+          <span class="tb-step-num">2</span>
+          <span class="tb-step-text">Payment Scan</span>
+        </div>
+        <div class="tb-step-line"></div>
+        <div class="tb-step" id="stepIndicator3">
+          <span class="tb-step-num">3</span>
+          <span class="tb-step-text">Submit Details</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 1: SELECT TICKETS -->
+  <section id="stepSelection">
+    <div class="container">
+      <!-- DRAW DATE SELECTION -->
+      <div class="dr-controls glass-card" style="margin-bottom: 24px; justify-content: space-between; align-items: center;">
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-size: 0.72rem; color: var(--gold); font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">DRAW / DATE</span>
+          <span id="bookingDrawLabel" style="font-size: 1.1rem; font-weight: 700; color: #fff;">Today's Ticket Booking</span>
+        </div>
+        <div>
+          <select id="drawSelector" class="form-input" style="max-width: 250px;" onchange="loadDrawTickets(this.value)">
+            <option value="">Loading draws…</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TICKET GRID CONTAINER -->
+      <div id="bookingLoading" class="dr-loading glass-card" style="padding: 40px; text-align: center;">
+        <div class="skeleton" style="height: 60px; margin-bottom: 15px;"></div>
+        <div class="skeleton" style="height: 120px; margin-bottom: 15px;"></div>
+        <div class="skeleton" style="height: 120px;"></div>
+      </div>
+
+      <div id="bookingInventory" style="display:none;">
+        <!-- Inject sets here -->
+        <div id="bookingSetsWrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2: PAYMENT & UTR SUBMISSION -->
+  <section id="stepPayment" style="display:none;">
+    <div class="container">
+      <div class="tb-payment-layout">
+        
+        <!-- Summary Card -->
+        <div class="glass-card tb-pay-summary">
+          <h3 class="gold" style="margin-bottom:16px; font-weight:800; font-size:1.15rem;">Booking Confirmation</h3>
+          
+          <div class="tb-summary-row"><span>Booking Date:</span><strong id="confirmDrawDate">-</strong></div>
+          <div class="tb-summary-row"><span>Selected Tickets:</span><strong id="confirmTicketsList" style="word-break: break-all; color: var(--gold);">-</strong></div>
+          <div class="tb-summary-row"><span>Ticket Count:</span><strong id="confirmCount">0</strong></div>
+          <div class="tb-summary-row"><span>Price per Ticket:</span><strong>₹40</strong></div>
+          
+          <div style="height:1px; background:rgba(245,200,66,0.15); margin:12px 0;"></div>
+          <div class="tb-summary-row" style="font-size: 1.1rem;">
+            <span style="font-weight:700;">Total Amount:</span>
+            <strong class="gold-gradient" id="confirmTotal" style="font-size:1.3rem;">₹0</strong>
+          </div>
+          
+          <button class="bo" style="width: 100%; margin-top: 20px; padding:12px;" onclick="goBackToSelection()">✏️ Edit Selection</button>
+        </div>
+
+        <!-- Payment Setup / QR Scan -->
+        <div class="glass-card tb-pay-details">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <span class="section-tag" style="margin-bottom: 8px;">Scan &amp; Pay</span>
+            <h3 style="font-size:1.3rem; font-weight:800;">Complete UPI Payment</h3>
+          </div>
+
+          <div class="tb-qr-container">
+            <div id="qrPlaceholder" style="width:180px; height:180px; background:rgba(10,46,24,0.6); border:1.5px dashed rgba(245,200,66,0.3); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px;">
+              <span style="font-size:2rem;">📷</span>
+              <span style="font-size:0.75rem; color:var(--text-muted);">QR Code not uploaded</span>
+            </div>
+            <img id="qrImage" src="" alt="UPI QR Code" style="display:none; width: 180px; height: 180px; border-radius: 8px; border:2px solid var(--glass-border); padding: 4px; background: #fff;" />
+          </div>
+
+          <div style="text-align: center; margin-bottom: 24px;">
+            <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom: 4px;">UPI Address (ID):</div>
+            <div id="payUpiId" style="font-size: 1.1rem; font-weight: 700; color: var(--gold); cursor: pointer;" onclick="copyUpiId()" title="Click to copy">example@upi</div>
+            <div id="payUpiName" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Payee: Kerala Lottery</div>
+          </div>
+
+          <div class="tb-instructions">
+            <h4 class="gold" style="font-size:0.85rem; font-weight:700; margin-bottom: 8px;">Instructions:</h4>
+            <ol>
+              <li>Scan the QR code or click/copy the UPI ID to pay.</li>
+              <li>Pay the exact booking amount of <strong class="gold" id="instructionTotal">₹0</strong>.</li>
+              <li>Keep your reference/UTR transaction number handy.</li>
+              <li>Fill out the proof submission form below.</li>
+            </ol>
+          </div>
+
+          <div style="height:1px; background:rgba(245,200,66,0.15); margin: 28px 0;"></div>
+
+          <form id="paymentForm" onsubmit="handlePaymentSubmit(event)">
+            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 16px;">Submit Payment Details</h3>
+            
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="custName" class="form-input" placeholder="Enter your full name" required />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">Mobile Number (WhatsApp)</label>
+              <input type="tel" id="custMobile" class="form-input" placeholder="e.g. +91 9876543210" required />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">UTR / Transaction Reference ID</label>
+              <input type="text" id="custUtr" class="form-input" placeholder="12-digit transaction ID" required />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 24px;">
+              <label class="form-label">Upload Payment Receipt Screenshot</label>
+              <input type="file" id="custScreenshot" class="form-input" accept="image/*" style="padding: 8px;" required />
+            </div>
+
+            <button type="submit" class="btn-gold-full" id="paymentSubmitBtn">
+              Submit Payment
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3: SUBMITTED & WHATSAPP SUPPORT -->
+  <section id="stepSubmitted" style="display:none;">
+    <div class="container" style="max-width: 600px;">
+      <div class="glass-card" style="padding: 40px; text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
+        <h2 class="gold-gradient" style="font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;">Booking Request Submitted</h2>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 24px;">Your payment details have been successfully uploaded and are pending verification.</p>
+        
+        <div style="background: rgba(10,46,24,0.6); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 28px;">
+          <div class="tb-summary-row"><span>Booking ID:</span><strong id="finalBookingId" class="gold">-</strong></div>
+          <div class="tb-summary-row"><span>Booking Date:</span><strong id="finalDrawDate">-</strong></div>
+          <div class="tb-summary-row"><span>Selected Tickets:</span><strong id="finalTicketsList" style="word-break: break-all;">-</strong></div>
+          <div class="tb-summary-row"><span>Total Amount:</span><strong id="finalTotal">-</strong></div>
+          <div class="tb-summary-row"><span>Status:</span><span class="st st-upcoming" style="padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">Pending Verification</span></div>
+        </div>
+
+        <div class="tb-instructions" style="margin-bottom: 28px; text-align: left;">
+          <p style="margin-bottom: 12px;"><strong>Important Next Step:</strong> Please click the button below to send your booking receipt details to our WhatsApp support team to expedite confirmation.</p>
+        </div>
+
+        <button class="btn-gold-full" style="background: linear-gradient(135deg, #25d366, #128c7e); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="sendWhatsAppMessage()">
+          <span style="font-size:1.2rem;">💬</span> Send Booking Details on WhatsApp
+        </button>
+
+        <a href="ticket-booking.html" class="bo" style="display: block; text-decoration: none; margin-top: 14px; padding: 12px;">Book More Tickets</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STICKY FLOATING SUMMARY BAR (STEP 1 ONLY) -->
+  <div class="tb-summary-bar" id="summaryBar">
+    <div class="container tb-summary-bar-inner">
+      <div class="tb-bar-details">
+        <div style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">SELECTED TICKETS:</div>
+        <div id="barSelectedCount" style="font-size:1.15rem; font-weight:800; color:#fff;">0 Tickets Selected</div>
+        <div id="barSelectedTickets" style="font-size:0.7rem; color:var(--gold); white-space:nowrap; text-overflow:ellipsis; overflow:hidden; max-width: 300px;">None</div>
+      </div>
+      <div class="tb-bar-action">
+        <div class="tb-bar-price">
+          <span style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">TOTAL:</span>
+          <span id="barTotalPrice" class="gold" style="font-size:1.3rem; font-weight:900;">₹0</span>
+        </div>
+        <button id="confirmTicketsBtn" class="btn-gold disabled" disabled onclick="proceedToConfirmation()">
+          Confirm Tickets
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- CONFIRMATION MODAL -->
+<div class="scanner-overlay" id="confirmModal" onclick="closeConfirmModal(event)" style="z-index: 10000;">
+  <div class="scanner-modal glass-card" style="max-width: 500px;">
+    <button class="scanner-close" onclick="closeConfirmModal(true)">✕</button>
+    
+    <div class="scanner-header" style="margin-bottom: 20px;">
+      <div class="scanner-icon-wrap" style="background: rgba(245,200,66,0.12); border-color: rgba(245,200,66,0.35); color: var(--gold);">
+        🎟
+      </div>
+      <h3 class="scanner-title">Confirm Ticket Reservation</h3>
+      <p class="scanner-sub">Review your selected tickets before proceeding to payment.</p>
+    </div>
+
+    <div style="background: rgba(6,26,14,0.8); border: 1.5px solid var(--glass-border); border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+      <div class="tb-summary-row"><span>Draw Date:</span><strong id="modalDrawDate">-</strong></div>
+      <div class="tb-summary-row" style="align-items: flex-start;">
+        <span>Tickets:</span>
+        <div id="modalTickets" style="text-align: right; color: var(--gold); font-weight: 700; word-break: break-all; max-height: 100px; overflow-y: auto;">-</div>
+      </div>
+      <div class="tb-summary-row"><span>Quantity:</span><strong id="modalCount">0</strong></div>
+      <div class="tb-summary-row"><span>Price per Ticket:</span><strong>₹40</strong></div>
+      <div style="height:1px; background:rgba(245,200,66,0.15); margin: 8px 0;"></div>
+      <div class="tb-summary-row">
+        <span style="font-weight: 700;">Total:</span>
+        <strong class="gold-gradient" id="modalTotal" style="font-size: 1.15rem;">₹0</strong>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 12px;">
+      <button class="bo" style="flex:1; padding: 12px;" onclick="closeConfirmModal(true)">Cancel</button>
+      <button class="bp" style="flex:2; padding: 12px;" id="proceedPaymentBtn" onclick="reserveAndProceedToPayment()">Proceed to Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-top-line"></div>
+  <div class="container">
+
+    <!-- Row 1: Quick links -->
+    <nav class="footer-links">
+      <a href="index.html#home" class="footer-link">Home</a>
+      <span class="footer-dot">•</span>
+      <a href="index.html#results" class="footer-link">Results</a>
+      <span class="footer-dot">•</span>
+      <a href="index.html#winners" class="footer-link">Winners</a>
+      <span class="footer-dot">•</span>
+      <a href="index.html#history" class="footer-link">History</a>
+      <span class="footer-dot">•</span>
+      <a href="daily-result.html" class="footer-link">Daily Result</a>
+      <span class="footer-dot">•</span>
+      <a href="ticket-booking.html" class="footer-link" style="color:var(--gold)">Ticket Booking</a>
+      <span class="footer-dot">•</span>
+      <a href="#" class="footer-link">Contact</a>
+    </nav>
+
+    <!-- Row 2: Disclaimer -->
+    <p class="footer-disclaimer-text">
+      Independent Kerala lottery result platform. Verify results with official sources before claiming prizes.
+    </p>
+
+    <!-- Row 3: Bottom bar -->
+    <div class="footer-bottom">
+      <span>© 2026 KeralaLottery Premium</span>
+      <span class="footer-live">
+        <span class="footer-live-dot"></span> Live Platform
+      </span>
+    </div>
+
+  </div>
+</footer>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav">
+  <a href="index.html#home" class="mob-nav-item">
+    <i data-lucide="home"></i><span>Home</span>
+  </a>
+  <a href="daily-result.html" class="mob-nav-item">
+    <i data-lucide="file-text"></i><span>Daily</span>
+  </a>
+  <a href="ticket-booking.html" class="mob-nav-item active">
+    <i data-lucide="ticket"></i><span>Book</span>
+  </a>
+  <a href="index.html#results" class="mob-nav-item">
+    <i data-lucide="trophy"></i><span>Results</span>
+  </a>
+</nav>
+
+<!-- FLOATING SUPPORT BUTTONS -->
+<div class="floating-support">
+  <a href="https://wa.me/919876543210" class="float-btn whatsapp" id="floatWhatsapp" title="WhatsApp Support" target="_blank">
+    <span class="float-icon">💬</span>
+  </a>
+  <a href="https://t.me/keralalottery" class="float-btn telegram" title="Telegram Channel" target="_blank">
+    <span class="float-icon">✈️</span>
+  </a>
+  <button class="float-btn support" title="Live Support" onclick="alert('Support chat coming soon!')">
+    <span class="float-icon">🎧</span>
+  </button>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="supabase-api.js"></script>
+<script src="ticket-booking.js"></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Support – Kerala Lottery Premium</title>
+  <meta name="description" content="Contact Kerala Lottery customer support team. Reach us on WhatsApp, Phone Call, or Live Chat." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<!-- FLOATING PARTICLES -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="container nav-container">
+    <a href="index.html" class="logo" style="text-decoration:none">
+      <div class="logo-icon">🎰</div>
+      <div>
+        <span class="logo-text">Kerala<span class="gold">Lottery</span></span>
+        <span class="logo-sub">Premium Result Platform</span>
+      </div>
+    </a>
+    <nav class="desktop-nav">
+      <a href="index.html#home" class="nav-link">Home</a>
+      <a href="daily-result.html" class="nav-link">Daily Result</a>
+      <a href="ticket-booking.html" class="nav-link">Ticket Booking</a>
+      <a href="support.html" class="nav-link active">Support</a>
+    </nav>
+    <div class="nav-actions">
+      <span class="live-badge"><span class="pulse-dot"></span> Live</span>
+      <a href="daily-result.html" class="btn-gold" style="text-decoration:none;display:inline-block;color:#030f0a">Daily Result</a>
+      <a href="ticket-booking.html" class="btn-gold highlight-booking" style="text-decoration:none;display:inline-block;margin-left:8px">🎟 Ticket Booking</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html#home" class="mob-link">Home</a>
+    <a href="daily-result.html" class="mob-link">Daily Result</a>
+    <a href="ticket-booking.html" class="mob-link">🎟 Ticket Booking</a>
+    <a href="support.html" class="mob-link" style="color:var(--gold)">Support</a>
+  </div>
+</header>
+
+<!-- SUPPORT MAIN CONTENT -->
+<main class="dr-page">
+  <section class="dr-hero">
+    <div class="container">
+      <div class="dr-hero-inner">
+        <span class="section-tag">Help Center</span>
+        <h1 class="dr-title">Customer <span class="gold-gradient">Support</span></h1>
+        <p class="dr-subtitle">Choose your preferred channel to contact our dedicated support team.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding: 20px 0 80px;">
+    <div class="container" style="max-width: 600px;">
+      <div class="glass-card" style="padding: 40px; text-align: center; display: flex; flex-direction: column; gap: 24px;">
+        <div style="font-size: 3.5rem;">🎧</div>
+        
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 8px;">How can we help you?</h2>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 16px;">
+          Our representatives are available to assist you with ticket bookings, payments, and general result inquiries.
+        </p>
+
+        <!-- WhatsApp Channel -->
+        <div id="supportWapSection" class="glass-card" style="padding: 20px; border-color: rgba(37,211,102,0.2); background: rgba(37,211,102,0.03); text-align: left; display: none;">
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <span style="color: #25d366;">💬</span> WhatsApp Support
+          </h3>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 14px;">Instant support and verification for your bookings and payments.</p>
+          <a id="supportWapBtn" href="#" target="_blank" class="btn-gold-full" style="background: linear-gradient(135deg, #25d366, #128c7e); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; height: 46px; border-radius: 8px; text-decoration: none;">
+            Send Message on WhatsApp
+          </a>
+        </div>
+
+        <!-- Call Channel -->
+        <div id="supportCallSection" class="glass-card" style="padding: 20px; border-color: rgba(245,200,66,0.2); background: rgba(245,200,66,0.03); text-align: left; display: none;">
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--gold);">📞</span> Phone Support
+          </h3>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 14px;">Speak directly with a support representative.</p>
+          <a id="supportCallBtn" href="#" class="btn-gold-full" style="text-decoration: none; background: linear-gradient(135deg, rgba(245,200,66,0.15), rgba(245,200,66,0.06)); border: 1.5px solid rgba(245,200,66,0.3); color: var(--gold); display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; height: 46px; border-radius: 8px;">
+            Call Support Now
+          </a>
+        </div>
+
+        <!-- Live Chat Channel -->
+        <div id="supportChatSection" class="glass-card" style="padding: 20px; border-color: rgba(0,123,255,0.2); background: rgba(0,123,255,0.03); text-align: left; display: none;">
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+            <span style="color: #007bff;">💬</span> Tawk.to Live Chat
+          </h3>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 14px;">Chat in real-time with one of our support agents.</p>
+          <button id="supportChatBtn" class="btn-gold-full" style="background: linear-gradient(135deg, #007bff, #0056b3); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; height: 46px; border-radius: 8px; border: none; cursor: pointer; width: 100%;" onclick="openTawkChat()">
+            Start Live Chat
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-container">
+    
+    <!-- Row 1: Logo & Links -->
+    <div class="footer-row-1">
+      <div class="logo">
+        <div class="logo-icon">🎰</div>
+        <div>
+          <span class="logo-text">Kerala<span class="gold">Lottery</span></span>
+          <span class="logo-sub">Premium Result Platform</span>
+        </div>
+      </div>
+      
+      <nav class="footer-links">
+        <a href="index.html#home" class="footer-link">Home</a>
+        <span class="footer-dot">•</span>
+        <a href="daily-result.html" class="footer-link">Daily Result</a>
+        <span class="footer-dot">•</span>
+        <a href="ticket-booking.html" class="footer-link">Ticket Booking</a>
+        <span class="footer-dot">•</span>
+        <a href="support.html" class="footer-link" style="color:var(--gold)">Support</a>
+      </nav>
+    </div>
+
+    <!-- Row 2: Disclaimer -->
+    <p class="footer-disclaimer-text">
+      Independent Kerala lottery result platform. Verify results with official sources before claiming prizes.
+    </p>
+
+    <!-- Row 3: Bottom bar -->
+    <div class="footer-bottom">
+      <span>© 2026 KeralaLottery Premium</span>
+      <span class="footer-live">
+        <span class="footer-live-dot"></span> Live Platform
+      </span>
+    </div>
+
+  </div>
+</footer>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav">
+  <a href="index.html#home" class="mob-nav-item">
+    <i data-lucide="home"></i><span>Home</span>
+  </a>
+  <a href="daily-result.html" class="mob-nav-item">
+    <i data-lucide="file-text"></i><span>Daily Result</span>
+  </a>
+  <a href="ticket-booking.html" class="mob-nav-item">
+    <i data-lucide="ticket"></i><span>Ticket Booking</span>
+  </a>
+  <a href="support.html" class="mob-nav-item active">
+    <i data-lucide="headphones"></i><span>Support</span>
+  </a>
+</nav>
+
+<script src="supabase-config.js"></script>
+<script src="supabase-api.js"></script>
+<script src="support.js"></script>
+</body>
+</html>

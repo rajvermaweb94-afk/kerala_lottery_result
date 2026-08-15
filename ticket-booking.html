@@ -15,16 +15,6 @@
 <!-- FLOATING PARTICLES -->
 <canvas id="particleCanvas"></canvas>
 
-<!-- LIVE TICKER -->
-<div class="ticker-wrap">
-  <span class="live-dot"></span>
-  <span class="live-label">LIVE</span>
-  <div class="ticker-track">
-    <span class="ticker-item">🏆 Karunya KR-702 Result Published &nbsp;|&nbsp; 1st Prize ₹1 Crore &nbsp;|&nbsp; Next Draw at 3 PM &nbsp;|&nbsp; Nirmal NR-389 Result Out &nbsp;|&nbsp; Win-Win W-780 Published &nbsp;|&nbsp; Akshaya AK-651 Result Live &nbsp;|&nbsp; Karunya Plus KN-570 Result Out &nbsp;|&nbsp; Sthree Sakthi SS-420 Published &nbsp;|&nbsp;</span>
-    <span class="ticker-item">🏆 Karunya KR-702 Result Published &nbsp;|&nbsp; 1st Prize ₹1 Crore &nbsp;|&nbsp; Next Draw at 3 PM &nbsp;|&nbsp; Nirmal NR-389 Result Out &nbsp;|&nbsp; Win-Win W-780 Published &nbsp;|&nbsp; Akshaya AK-651 Result Live &nbsp;|&nbsp; Karunya Plus KN-570 Result Out &nbsp;|&nbsp; Sthree Sakthi SS-420 Published &nbsp;|&nbsp;</span>
-  </div>
-</div>
-
 <!-- HEADER -->
 <header class="header" id="header">
   <div class="container nav-container">
@@ -37,14 +27,14 @@
     </a>
     <nav class="desktop-nav">
       <a href="index.html#home" class="nav-link">Home</a>
-      <a href="index.html#results" class="nav-link">Results</a>
-      <a href="index.html#winners" class="nav-link">Winners</a>
-      <a href="index.html#history" class="nav-link">History</a>
+      <a href="daily-result.html" class="nav-link">Daily Result</a>
+      <a href="ticket-booking.html" class="nav-link active">Ticket Booking</a>
+      <a href="support.html" class="nav-link">Support</a>
     </nav>
     <div class="nav-actions">
       <span class="live-badge"><span class="pulse-dot"></span> Live</span>
-      <a href="daily-result.html" class="btn-gold" style="text-decoration:none;display:inline-block">Daily Result</a>
-      <a href="ticket-booking.html" class="btn-gold highlight-booking" style="text-decoration:none;display:inline-block;margin-left:8px;color:#030f0a">🎟 Ticket Booking</a>
+      <a href="daily-result.html" class="btn-gold" style="text-decoration:none;display:inline-block;color:#030f0a">Daily Result</a>
+      <a href="ticket-booking.html" class="btn-gold highlight-booking" style="text-decoration:none;display:inline-block;margin-left:8px">🎟 Ticket Booking</a>
     </div>
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
@@ -52,11 +42,9 @@
   </div>
   <div class="mobile-menu" id="mobileMenu">
     <a href="index.html#home" class="mob-link">Home</a>
-    <a href="index.html#results" class="mob-link">Results</a>
-    <a href="index.html#winners" class="mob-link">Winners</a>
-    <a href="index.html#history" class="mob-link">History</a>
     <a href="daily-result.html" class="mob-link">Daily Result</a>
     <a href="ticket-booking.html" class="mob-link" style="color:var(--gold)">🎟 Ticket Booking</a>
+    <a href="support.html" class="mob-link">Support</a>
   </div>
 </header>
 
@@ -329,17 +317,11 @@
     <nav class="footer-links">
       <a href="index.html#home" class="footer-link">Home</a>
       <span class="footer-dot">•</span>
-      <a href="index.html#results" class="footer-link">Results</a>
-      <span class="footer-dot">•</span>
-      <a href="index.html#winners" class="footer-link">Winners</a>
-      <span class="footer-dot">•</span>
-      <a href="index.html#history" class="footer-link">History</a>
-      <span class="footer-dot">•</span>
       <a href="daily-result.html" class="footer-link">Daily Result</a>
       <span class="footer-dot">•</span>
       <a href="ticket-booking.html" class="footer-link" style="color:var(--gold)">Ticket Booking</a>
       <span class="footer-dot">•</span>
-      <a href="#" class="footer-link">Contact</a>
+      <a href="support.html" class="footer-link">Support</a>
     </nav>
 
     <!-- Row 2: Disclaimer -->
@@ -364,28 +346,15 @@
     <i data-lucide="home"></i><span>Home</span>
   </a>
   <a href="daily-result.html" class="mob-nav-item">
-    <i data-lucide="file-text"></i><span>Daily</span>
+    <i data-lucide="file-text"></i><span>Daily Result</span>
   </a>
   <a href="ticket-booking.html" class="mob-nav-item active">
-    <i data-lucide="ticket"></i><span>Book</span>
+    <i data-lucide="ticket"></i><span>Ticket Booking</span>
   </a>
-  <a href="index.html#results" class="mob-nav-item">
-    <i data-lucide="trophy"></i><span>Results</span>
+  <a href="support.html" class="mob-nav-item">
+    <i data-lucide="headphones"></i><span>Support</span>
   </a>
 </nav>
-
-<!-- FLOATING SUPPORT BUTTONS -->
-<div class="floating-support">
-  <a href="https://wa.me/919876543210" class="float-btn whatsapp" id="floatWhatsapp" title="WhatsApp Support" target="_blank">
-    <span class="float-icon">💬</span>
-  </a>
-  <a href="https://t.me/keralalottery" class="float-btn telegram" title="Telegram Channel" target="_blank">
-    <span class="float-icon">✈️</span>
-  </a>
-  <button class="float-btn support" title="Live Support" onclick="alert('Support chat coming soon!')">
-    <span class="float-icon">🎧</span>
-  </button>
-</div>
 
 <script src="supabase-config.js"></script>
 <script src="supabase-api.js"></script>

@@ -111,7 +111,7 @@ body {
 
 /* ===== HEADER ===== */
 .header {
-  position: fixed; top: 36px; left: 0; right: 0; z-index: 999;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 999;
   background: rgba(3,15,10,0.85);
   backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid rgba(245,200,66,0.12);
@@ -183,7 +183,7 @@ body {
 .hero {
   min-height: 100vh; display: flex; align-items: center;
   position: relative; overflow: hidden;
-  padding: 140px 0 100px;
+  padding: 104px 0 100px;
   background:
     radial-gradient(ellipse 90% 70% at 50% -10%, rgba(26,122,64,0.28) 0%, transparent 65%),
     radial-gradient(ellipse 50% 40% at 85% 85%, rgba(245,200,66,0.09) 0%, transparent 55%),
@@ -1128,12 +1128,13 @@ body {
   .desktop-nav, .nav-actions { display: none; }
   .hamburger { display: flex; }
   .mobile-bottom-nav { display: flex; }
+  .tb-summary-bar { bottom: 56px !important; }
   .floating-support { bottom: 80px; }
   .floating-ticket { display: none; }
   .coin { display: none; }
   .lottery-balls-wrap { display: none; }
   .light-beam { display: none; }
-  .hero { padding: 100px 0 70px; }
+  .hero { padding: 64px 0 70px; }
   .btn-gold-lg { width: 100%; justify-content: center; }
   .hero-stats { padding: 14px 16px; gap: 0; }
   .hero-stat { padding: 0 14px; }
@@ -1267,7 +1268,7 @@ body {
 
 /* ── Page wrapper ── */
 .dr-page {
-  padding-top: 104px; /* ticker 36px + header 68px */
+  padding-top: 68px; /* header 68px */
   min-height: 100vh;
   position: relative;
   z-index: 1;
@@ -1676,7 +1677,7 @@ body {
 
 /* ── Daily Result Responsive ── */
 @media (max-width: 768px) {
-  .dr-page { padding-top: 96px; }
+  .dr-page { padding-top: 68px; padding-bottom: 140px; }
   .dr-hero { padding: 32px 0 16px; }
   .dr-title { font-size: 1.5rem; }
   .dr-subtitle { font-size: 0.9rem; }
@@ -1693,21 +1694,7 @@ body {
 }
 
 @media (max-width: 480px) {
-  .dr-page { padding-top: 90px; }
-  .dr-hero { padding: 24px 0 12px; }
-  .dr-title { font-size: 1.3rem; }
-  .dr-controls { padding: 12px; }
-  .dr-filter-btn { font-size: 0.7rem; padding: 7px 8px; }
-  .dr-results-card { padding: 12px; }
-}
-
-  .dr-filter-btn { flex: 1; text-align: center; padding: 8px 10px; font-size: 0.75rem; }
-  .dr-results-card { padding: 16px; }
-  .dr-results-section { padding-bottom: 100px; }
-}
-
-@media (max-width: 480px) {
-  .dr-page { padding-top: 90px; }
+  .dr-page { padding-top: 68px; padding-bottom: 140px; }
   .dr-hero { padding: 24px 0 12px; }
   .dr-title { font-size: 1.3rem; }
   .dr-controls { padding: 12px; }

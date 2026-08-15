@@ -14,16 +14,6 @@
 <!-- FLOATING PARTICLES -->
 <canvas id="particleCanvas"></canvas>
 
-<!-- LIVE TICKER -->
-<div class="ticker-wrap">
-  <span class="live-dot"></span>
-  <span class="live-label">LIVE</span>
-  <div class="ticker-track">
-    <span class="ticker-item">🏆 Karunya KR-702 Result Published &nbsp;|&nbsp; 1st Prize ₹1 Crore &nbsp;|&nbsp; Next Draw at 3 PM &nbsp;|&nbsp; Nirmal NR-389 Result Out &nbsp;|&nbsp; Win-Win W-780 Published &nbsp;|&nbsp; Akshaya AK-651 Result Live &nbsp;|&nbsp; Karunya Plus KN-570 Result Out &nbsp;|&nbsp; Sthree Sakthi SS-420 Published &nbsp;|&nbsp;</span>
-    <span class="ticker-item">🏆 Karunya KR-702 Result Published &nbsp;|&nbsp; 1st Prize ₹1 Crore &nbsp;|&nbsp; Next Draw at 3 PM &nbsp;|&nbsp; Nirmal NR-389 Result Out &nbsp;|&nbsp; Win-Win W-780 Published &nbsp;|&nbsp; Akshaya AK-651 Result Live &nbsp;|&nbsp; Karunya Plus KN-570 Result Out &nbsp;|&nbsp; Sthree Sakthi SS-420 Published &nbsp;|&nbsp;</span>
-  </div>
-</div>
-
 <!-- HEADER -->
 <header class="header" id="header">
   <div class="container nav-container">
@@ -35,10 +25,10 @@
       </div>
     </div>
     <nav class="desktop-nav">
-      <a href="#home" class="nav-link active">Home</a>
-      <a href="#results" class="nav-link">Results</a>
-      <a href="#winners" class="nav-link">Winners</a>
-      <a href="#history" class="nav-link">History</a>
+      <a href="index.html#home" class="nav-link active">Home</a>
+      <a href="daily-result.html" class="nav-link">Daily Result</a>
+      <a href="ticket-booking.html" class="nav-link">Ticket Booking</a>
+      <a href="support.html" class="nav-link">Support</a>
     </nav>
     <div class="nav-actions">
       <span class="live-badge"><span class="pulse-dot"></span> Live</span>
@@ -50,12 +40,10 @@
     </button>
   </div>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="#home" class="mob-link">Home</a>
-    <a href="#results" class="mob-link">Results</a>
-    <a href="#winners" class="mob-link">Winners</a>
-    <a href="#history" class="mob-link">History</a>
+    <a href="index.html#home" class="mob-link">Home</a>
     <a href="daily-result.html" class="mob-link">Daily Result</a>
-    <a href="ticket-booking.html" class="mob-link" style="color:var(--gold)">🎟 Ticket Booking</a>
+    <a href="ticket-booking.html" class="mob-link">🎟 Ticket Booking</a>
+    <a href="support.html" class="mob-link">Support</a>
   </div>
 </header>
 
@@ -340,48 +328,6 @@
   </div>
 </section>
 
-<!-- RESULT HISTORY -->
-<section class="section" id="history">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-tag">History</span>
-      <h2 class="section-title">Result <span class="gold-gradient">History</span></h2>
-    </div>
-    <div class="history-card glass-card reveal reveal-up">
-      <div class="history-controls">
-        <div class="search-wrap">
-          <i data-lucide="search"></i>
-          <input type="text" id="historySearch" placeholder="Search draw name or number…" class="history-search" oninput="filterHistory()" />
-        </div>
-        <select id="historyFilter" class="form-input history-filter" onchange="filterHistory()">
-          <option value="">All Lotteries</option>
-          <option>Karunya</option>
-          <option>Nirmal</option>
-          <option>Win-Win</option>
-          <option>Akshaya</option>
-          <option>Karunya Plus</option>
-          <option>Sthree Sakthi</option>
-        </select>
-      </div>
-      <div class="table-wrap">
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>Draw Name</th>
-              <th>Date</th>
-              <th>1st Prize Number</th>
-              <th>Prize Amount</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="historyBody"></tbody>
-        </table>
-      </div>
-      <div class="pagination" id="pagination"></div>
-    </div>
-  </div>
-</section>
-
 <!-- FEATURES -->
 <section class="section features-section">
   <div class="container">
@@ -421,15 +367,13 @@
 
     <!-- Row 1: Quick links -->
     <nav class="footer-links">
-      <a href="#home" class="footer-link">Home</a>
+      <a href="index.html#home" class="footer-link">Home</a>
       <span class="footer-dot">•</span>
-      <a href="#results" class="footer-link">Results</a>
+      <a href="daily-result.html" class="footer-link">Daily Result</a>
       <span class="footer-dot">•</span>
-      <a href="#winners" class="footer-link">Winners</a>
+      <a href="ticket-booking.html" class="footer-link">Ticket Booking</a>
       <span class="footer-dot">•</span>
-      <a href="#history" class="footer-link">History</a>
-      <span class="footer-dot">•</span>
-      <a href="#" class="footer-link">Contact</a>
+      <a href="support.html" class="footer-link">Support</a>
     </nav>
 
     <!-- Row 2: Disclaimer -->
@@ -450,32 +394,19 @@
 
 <!-- MOBILE BOTTOM NAV -->
 <nav class="mobile-bottom-nav">
-  <a href="#home" class="mob-nav-item active">
+  <a href="index.html#home" class="mob-nav-item active">
     <i data-lucide="home"></i><span>Home</span>
   </a>
-  <a href="#results" class="mob-nav-item">
-    <i data-lucide="trophy"></i><span>Results</span>
+  <a href="daily-result.html" class="mob-nav-item">
+    <i data-lucide="file-text"></i><span>Daily Result</span>
   </a>
-  <a href="#winners" class="mob-nav-item">
-    <i data-lucide="star"></i><span>Winners</span>
+  <a href="ticket-booking.html" class="mob-nav-item">
+    <i data-lucide="ticket"></i><span>Ticket Booking</span>
   </a>
-  <a href="#" class="mob-nav-item">
+  <a href="support.html" class="mob-nav-item">
     <i data-lucide="headphones"></i><span>Support</span>
   </a>
 </nav>
-
-<!-- FLOATING SUPPORT BUTTONS -->
-<div class="floating-support">
-  <a href="https://wa.me/919876543210" class="float-btn whatsapp" title="WhatsApp Support" target="_blank">
-    <span class="float-icon">💬</span>
-  </a>
-  <a href="https://t.me/keralalottery" class="float-btn telegram" title="Telegram Channel" target="_blank">
-    <span class="float-icon">✈️</span>
-  </a>
-  <button class="float-btn support" title="Live Support" onclick="alert('Support chat coming soon!')">
-    <span class="float-icon">🎧</span>
-  </button>
-</div>
 
 <!-- SCANNER MODAL -->
 <div class="scanner-overlay" id="scannerOverlay" onclick="closeScanner(event)">

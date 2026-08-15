@@ -25,10 +25,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (backendOnline) {
     await loadTodayResults();
     await loadWinners();
-    await loadHistory();
+    if (document.getElementById('historyBody')) await loadHistory();
   } else {
     renderWinners();
-    renderHistory();
+    if (document.getElementById('historyBody')) renderHistory();
   }
   initScrollAnimations();
   initAmbientEffects();
@@ -786,7 +786,7 @@ function initMobileNav() {
   });
 
   // Highlight nav on scroll
-  const sections = ['home', 'results', 'winners', 'tickets', 'history'];
+  const sections = ['home', 'results', 'winners', 'tickets'];
   const navLinks = document.querySelectorAll('.nav-link');
   window.addEventListener('scroll', () => {
     let current = '';

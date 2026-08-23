@@ -83,6 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     showDrLoading(false);
     applyDrFilters();
   }, 600);
+  
+  loadLiveChatSettings();
 });
 
 /* ── Particle canvas (reuse from main site) ── */
@@ -225,11 +227,10 @@ function applyDrFilters() {
   renderDrResults();
 }
 
-/* ── Format date ── */
 function formatDate(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return `${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T12:00:00Z');
+  return formatISTDate(d);
 }
 
 /* ── Render ── */
@@ -468,3 +469,93 @@ window.addEventListener('resize', () => {
     if (drFiltered.length > 0) renderDrResults();
   }
 });
+
+/* ===== DYNAMIC LIVE CHAT WIDGET & FLOAT BUTTON ===== */
+let bookingSettings = null;
+async function loadLiveChatSettings() {
+  try {
+    const db = getDB();
+    bookingSettings = await db.getBookingSettings();
+    const chatBtn = document.getElementById('floatingSupportChat');
+    if (bookingSettings.live_chat_enabled && bookingSettings.tawk_embed_code) {
+      injectTawkScript(bookingSettings.tawk_embed_code);
+      if (chatBtn) chatBtn.style.display = 'block';
+    } else {
+      if (chatBtn) chatBtn.style.display = 'none';
+    }
+  } catch (e) {
+    console.warn("Failed to load live chat settings", e);
+  }
+}
+
+function injectTawkScript(embedCode) {
+  if (window.Tawk_API || document.getElementById('tawk-injected')) return;
+  try {
+    const container = document.createElement('div');
+    container.id = 'tawk-injected';
+    container.style.display = 'none';
+    container.innerHTML = embedCode.trim();
+    
+    const scriptNode = container.querySelector('script');
+    if (scriptNode) {
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.async = true;
+      script.charset = 'UTF-8';
+      
+      const srcMatch = scriptNode.textContent.match(/s1\.src\s*=\s*['"](https:\/\/embed\.tawk\.to\/[^'"]+)['"]/);
+      if (srcMatch && srcMatch[1]) {
+        script.src = srcMatch[1];
+      } else {
+        const srcAttr = scriptNode.getAttribute('src');
+        if (srcAttr) {
+          script.src = srcAttr;
+        } else {
+          script.textContent = scriptNode.textContent;
+        }
+      }
+      document.head.appendChild(script);
+    }
+  } catch (err) {
+    console.error("Failed to dynamically load Tawk script", err);
+  }
+}
+
+function openTawkChat() {
+  if (window.Tawk_API && typeof window.Tawk_API.maximize === 'function') {
+    window.Tawk_API.maximize();
+  } else {
+    alert("Live chat is loading. Please try again in a few seconds.");
+  }
+}
+
+/* ── IST Timezone Helpers ── */
+function formatISTDate(dateInput) {
+  const d = dateInput ? new Date(dateInput) : new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+  return formatter.format(d);
+}
+
+function formatISTTime(dateInput) {
+  const d = dateInput ? new Date(dateInput) : new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+  const parts = formatter.formatToParts(d);
+  const h = parts.find(p => p.type === 'hour').value;
+  const m = parts.find(p => p.type === 'minute').value;
+  const dayPeriod = parts.find(p => p.type === 'dayPeriod')?.value || 'PM';
+  return `${h}:${m} ${dayPeriod} IST`;
+}
+
+function formatISTDateTime(dateInput) {
+  return `${formatISTDate(dateInput)}, ${formatISTTime(dateInput)}`;
+}

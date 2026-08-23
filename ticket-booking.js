@@ -96,10 +96,14 @@ async function loadSettings() {
     document.getElementById('payUpiId').textContent = bookingSettings.upi_id;
     document.getElementById('payUpiName').textContent = `Payee: ${bookingSettings.upi_name}`;
     
-    // Update floating support links
-    const phone = bookingSettings.whatsapp_number.replace(/\D/g, '');
-    const floatWap = document.getElementById('floatWhatsapp');
-    if (floatWap) floatWap.href = `https://wa.me/${phone}`;
+    // Show/hide floating support live chat button
+    const floatChat = document.getElementById('floatingSupportChat');
+    if (bookingSettings.live_chat_enabled && bookingSettings.tawk_embed_code) {
+      injectTawkScript(bookingSettings.tawk_embed_code);
+      if (floatChat) floatChat.style.display = 'block';
+    } else {
+      if (floatChat) floatChat.style.display = 'none';
+    }
     
     // Show QR code if present
     const qrImage = document.getElementById('qrImage');
@@ -535,7 +539,7 @@ async function handlePaymentSubmit(e) {
   
   const name = document.getElementById('custName').value.trim();
   const mobile = document.getElementById('custMobile').value.trim();
-  const utr = document.getElementById('custUtr').value.trim();
+  const utr = "Not Required";
   const fileInput = document.getElementById('custScreenshot');
   
   let screenshotBase64 = null;
@@ -568,6 +572,7 @@ async function handlePaymentSubmit(e) {
     // Update Step 3 Submitted Fields
     document.getElementById('finalBookingId').textContent = currentBooking.booking_id;
     document.getElementById('finalDrawDate').textContent = document.getElementById('confirmDrawDate').textContent;
+    document.getElementById('finalBookingTime').textContent = formatISTDateTime(new Date());
     document.getElementById('finalTicketsList').textContent = document.getElementById('confirmTicketsList').textContent;
     document.getElementById('finalTotal').textContent = document.getElementById('confirmTotal').textContent;
     
@@ -662,9 +667,8 @@ Payment Status: ${currentBooking.status || 'Payment Details Submitted'}`;
 /* ── Format date string ── */
 function formatDate(dateStr) {
   if (!dateStr) return '';
-  const d = new Date(dateStr + 'T00:00:00');
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return `${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  const d = new Date(dateStr + 'T12:00:00Z');
+  return formatISTDate(d);
 }
 
 /* ── Toast notifications ── */
@@ -777,4 +781,35 @@ function openTawkChat() {
   } else {
     alert("Live chat is loading. Please try again in a few seconds.");
   }
+}
+
+/* ── IST Timezone Helpers ── */
+function formatISTDate(dateInput) {
+  const d = dateInput ? new Date(dateInput) : new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+  return formatter.format(d);
+}
+
+function formatISTTime(dateInput) {
+  const d = dateInput ? new Date(dateInput) : new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+  const parts = formatter.formatToParts(d);
+  const h = parts.find(p => p.type === 'hour').value;
+  const m = parts.find(p => p.type === 'minute').value;
+  const dayPeriod = parts.find(p => p.type === 'dayPeriod')?.value || 'PM';
+  return `${h}:${m} ${dayPeriod} IST`;
+}
+
+function formatISTDateTime(dateInput) {
+  return `${formatISTDate(dateInput)}, ${formatISTTime(dateInput)}`;
 }

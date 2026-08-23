@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initHamburger();
   initMobileNav();
   setDefaultDate();
+  loadLiveChatSettings();
 });
 
 /* ===== PARTICLES (background fixed canvas) ===== */
@@ -219,14 +220,30 @@ async function loadTodayResults() {
       if (a) a.textContent = prize.amount;
       if (t) t.textContent = prize.ticket;
       if (l && prize.label) l.textContent = prize.label;
-      if (m) m.textContent = `${draw.draw_name} ${draw.draw_number} | ${draw.draw_date}`;
+      if (m) {
+        const dDate = new Date(draw.draw_date + 'T12:00:00Z');
+        const drawDateStr = formatISTDate(dDate);
+        const dayName = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Kolkata',
+          weekday: 'long'
+        }).format(dDate);
+        m.textContent = `${draw.draw_name} ${draw.draw_number} | ${dayName}, ${drawDateStr} | 3:00 PM IST`;
+      }
     });
 
     // Update countdown
     const upcoming = await db.getUpcomingDraw();
     if (upcoming) {
       const sub2 = document.querySelector('.countdown-sub');
-      if (sub2) sub2.textContent = `${upcoming.draw_name} ${upcoming.draw_number} | ${upcoming.draw_date} | ${upcoming.draw_time}`;
+      if (sub2) {
+        const dDate = new Date(upcoming.draw_date + 'T12:00:00Z');
+        const drawDateStr = formatISTDate(dDate);
+        const dayName = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Kolkata',
+          weekday: 'long'
+        }).format(dDate);
+        sub2.textContent = `${upcoming.draw_name} ${upcoming.draw_number} | ${dayName}, ${drawDateStr} | 3:00 PM IST`;
+      }
     }
   } catch(e) { console.warn('Supabase load failed, using static data', e); }
 }
@@ -277,54 +294,59 @@ async function loadHistory() {
 }
 
 function initCountdown() {
-  // Always counts down to the NEXT 3:00 PM IST (UTC+5:30)
-  // If it's already past 3 PM IST today, targets tomorrow's 3 PM IST
-
+  // Always counts down to the NEXT 3:00 PM IST (Asia/Kolkata timezone)
+  
   function getNext3PMIST() {
     const now = new Date();
-
-    // IST offset = UTC + 5h 30m = 330 minutes
-    const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-
-    // Current time in IST
-    const nowIST = new Date(now.getTime() + IST_OFFSET_MS);
-
-    // Build today's 3 PM IST as a UTC date
-    const target = new Date(Date.UTC(
-      nowIST.getUTCFullYear(),
-      nowIST.getUTCMonth(),
-      nowIST.getUTCDate(),
-      9, 30, 0, 0   // 15:00 IST = 09:30 UTC
-    ));
-
-    // If 3 PM IST has already passed today, move to tomorrow
-    if (now >= target) {
-      target.setUTCDate(target.getUTCDate() + 1);
+    
+    // Transform absolute now to IST timezone parameters
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+      hour12: false
+    });
+    
+    const parts = formatter.formatToParts(now);
+    const getVal = (type) => parseInt(parts.find(p => p.type === type).value);
+    
+    const year = getVal('year');
+    const month = getVal('month') - 1; // Intl month is 1-indexed
+    const day = getVal('day');
+    
+    // Construct today's 3:00 PM IST in UTC (which is exactly 9:30 AM UTC)
+    const targetUTC = new Date(Date.UTC(year, month, day, 9, 30, 0, 0));
+    
+    // If the current time is past or equal to today's 3:00 PM IST target:
+    if (now.getTime() >= targetUTC.getTime()) {
+      targetUTC.setUTCDate(targetUTC.getUTCDate() + 1);
     }
-
-    return target;
+    
+    return targetUTC;
   }
-
+  
   let target = getNext3PMIST();
-
+  
   function update() {
-    const now  = new Date();
-    let   diff = target - now;
-
-    // When timer hits zero, reset to next day's 3 PM IST
+    const now = new Date();
+    let diff = target.getTime() - now.getTime();
+    
     if (diff <= 0) {
       target = getNext3PMIST();
-      diff   = target - new Date();
+      diff = target.getTime() - now.getTime();
     }
-
+    
+    if (diff < 0) diff = 0; // Guard against negative diff
+    
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
+    
     animateTimerValue('timerHours',   String(h).padStart(2, '0'));
     animateTimerValue('timerMinutes', String(m).padStart(2, '0'));
     animateTimerValue('timerSeconds', String(s).padStart(2, '0'));
   }
-
+  
   update();
   setInterval(update, 1000);
 }
@@ -435,7 +457,7 @@ function demoCheckResult(ticket, date, lottery, display) {
         <div class="result-badge">${ranks[idx]}</div>
         <div class="result-meta">
           Ticket: <strong style="color:var(--text-primary)">${ticket}</strong> &nbsp;|&nbsp;
-          ${lottery} &nbsp;|&nbsp; ${date || '21 May 2026'}
+          ${lottery} &nbsp;|&nbsp; ${date || '23 Aug 2026'}
         </div>
         <p style="margin-top:16px;font-size:.85rem;color:var(--text-secondary)">
           Please claim your prize at the nearest Kerala Lottery office with original ticket.
@@ -451,7 +473,7 @@ function demoCheckResult(ticket, date, lottery, display) {
           Ticket <strong style="color:var(--text-primary)">${ticket}</strong> did not win in this draw.
         </div>
         <div style="color:var(--text-muted);font-size:.85rem;font-weight:600">
-          ${lottery} &nbsp;|&nbsp; ${date || '21 May 2026'}
+          ${lottery} &nbsp;|&nbsp; ${date || '23 Aug 2026'}
         </div>
         <p style="margin-top:18px;font-size:.9rem;color:var(--text-secondary)">
           Better luck next time! Try again with tomorrow's draw. 🍀
@@ -916,3 +938,93 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     }
   });
 });
+
+/* ===== DYNAMIC LIVE CHAT WIDGET & FLOAT BUTTON ===== */
+let bookingSettings = null;
+async function loadLiveChatSettings() {
+  try {
+    const db = getDB();
+    bookingSettings = await db.getBookingSettings();
+    const chatBtn = document.getElementById('floatingSupportChat');
+    if (bookingSettings.live_chat_enabled && bookingSettings.tawk_embed_code) {
+      injectTawkScript(bookingSettings.tawk_embed_code);
+      if (chatBtn) chatBtn.style.display = 'block';
+    } else {
+      if (chatBtn) chatBtn.style.display = 'none';
+    }
+  } catch (e) {
+    console.warn("Failed to load live chat settings", e);
+  }
+}
+
+function injectTawkScript(embedCode) {
+  if (window.Tawk_API || document.getElementById('tawk-injected')) return;
+  try {
+    const container = document.createElement('div');
+    container.id = 'tawk-injected';
+    container.style.display = 'none';
+    container.innerHTML = embedCode.trim();
+    
+    const scriptNode = container.querySelector('script');
+    if (scriptNode) {
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.async = true;
+      script.charset = 'UTF-8';
+      
+      const srcMatch = scriptNode.textContent.match(/s1\.src\s*=\s*['"](https:\/\/embed\.tawk\.to\/[^'"]+)['"]/);
+      if (srcMatch && srcMatch[1]) {
+        script.src = srcMatch[1];
+      } else {
+        const srcAttr = scriptNode.getAttribute('src');
+        if (srcAttr) {
+          script.src = srcAttr;
+        } else {
+          script.textContent = scriptNode.textContent;
+        }
+      }
+      document.head.appendChild(script);
+    }
+  } catch (err) {
+    console.error("Failed to dynamically load Tawk script", err);
+  }
+}
+
+function openTawkChat() {
+  if (window.Tawk_API && typeof window.Tawk_API.maximize === 'function') {
+    window.Tawk_API.maximize();
+  } else {
+    alert("Live chat is loading. Please try again in a few seconds.");
+  }
+}
+
+/* ── IST Timezone Helpers ── */
+function formatISTDate(dateInput) {
+  const d = dateInput ? new Date(dateInput) : new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+  return formatter.format(d);
+}
+
+function formatISTTime(dateInput) {
+  const d = dateInput ? new Date(dateInput) : new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+  const parts = formatter.formatToParts(d);
+  const h = parts.find(p => p.type === 'hour').value;
+  const m = parts.find(p => p.type === 'minute').value;
+  const dayPeriod = parts.find(p => p.type === 'dayPeriod')?.value || 'PM';
+  return `${h}:${m} ${dayPeriod} IST`;
+}
+
+function formatISTDateTime(dateInput) {
+  return `${formatISTDate(dateInput)}, ${formatISTTime(dateInput)}`;
+}

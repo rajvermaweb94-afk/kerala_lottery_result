@@ -712,7 +712,8 @@ async function viewBookingDetails(id) {
         <div><strong>Customer Name:</strong> <span style="color:#fff">${details.booking.customer_name}</span></div>
         <div><strong>Mobile:</strong> <span style="color:#fff">${details.booking.mobile_number}</span></div>
         <div><strong>UTR Number / Reference ID:</strong> <span style="color:var(--gold); font-weight:700">${details.booking.utr_number}</span></div>
-        <div><strong>Draw Date:</strong> <span style="color:#fff">${details.draw ? details.draw.draw_name + ' (' + details.draw.draw_number + ') — ' + details.draw.draw_date : '-'}</span></div>
+        <div><strong>Booking Date/Time:</strong> <span style="color:#fff">${formatISTDateTime(details.booking.created_at || details.booking.updated_at)}</span></div>
+        <div><strong>Draw Date:</strong> <span style="color:#fff">${details.draw ? details.draw.draw_name + ' (' + details.draw.draw_number + ') — ' + formatDate(details.draw.draw_date) : '-'}</span></div>
         <div><strong>Tickets:</strong> <span style="color:var(--gold); font-weight:700; word-break:break-all">${tNumbers}</span></div>
         <div><strong>Ticket Count:</strong> <span style="color:#fff">${details.booking.ticket_count}</span></div>
         <div><strong>Total Price:</strong> <span style="color:var(--gold)">₹${details.booking.total_amount}</span></div>
@@ -1016,7 +1017,7 @@ async function downloadReceipt(id) {
       return;
     }
     
-    const confirmDate = b.confirmed_at ? new Date(b.confirmed_at).toLocaleString() : new Date(b.updated_at).toLocaleString();
+    const confirmDate = formatISTDateTime(b.confirmed_at || b.updated_at);
     const whatsappSupport = b.assigned_whatsapp_number || '—';
     const callSupport = b.assigned_call_number || '—';
 
@@ -1283,7 +1284,37 @@ Thank you.`;
 // Simple date formatter helper
 function formatDate(dateStr) {
   if (!dateStr) return '';
-  const d = new Date(dateStr + 'T00:00:00');
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return `${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  const d = new Date(dateStr + 'T12:00:00Z');
+  return formatISTDate(d);
+}
+
+/* ── IST Timezone Helpers ── */
+function formatISTDate(dateInput) {
+  const d = dateInput ? new Date(dateInput) : new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+  return formatter.format(d);
+}
+
+function formatISTTime(dateInput) {
+  const d = dateInput ? new Date(dateInput) : new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+  const parts = formatter.formatToParts(d);
+  const h = parts.find(p => p.type === 'hour').value;
+  const m = parts.find(p => p.type === 'minute').value;
+  const dayPeriod = parts.find(p => p.type === 'dayPeriod')?.value || 'PM';
+  return `${h}:${m} ${dayPeriod} IST`;
+}
+
+function formatISTDateTime(dateInput) {
+  return `${formatISTDate(dateInput)}, ${formatISTTime(dateInput)}`;
 }

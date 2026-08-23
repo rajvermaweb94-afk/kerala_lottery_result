@@ -41,11 +41,14 @@ async function loadSupportSettings() {
 
     // 3. Live Chat
     const chatSection = document.getElementById('supportChatSection');
+    const floatChat = document.getElementById('floatingSupportChat');
     if (bookingSettings.live_chat_enabled && bookingSettings.tawk_embed_code) {
       injectTawkScript(bookingSettings.tawk_embed_code);
       chatSection.style.display = 'block';
+      if (floatChat) floatChat.style.display = 'block';
     } else {
       chatSection.style.display = 'none';
+      if (floatChat) floatChat.style.display = 'none';
     }
 
   } catch (err) {

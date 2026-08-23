@@ -183,11 +183,6 @@
               <input type="tel" id="custMobile" class="form-input" placeholder="e.g. +91 9876543210" required />
             </div>
 
-            <div class="form-group" style="margin-bottom: 16px;">
-              <label class="form-label">UTR / Transaction Reference ID</label>
-              <input type="text" id="custUtr" class="form-input" placeholder="12-digit transaction ID" required />
-            </div>
-
             <div class="form-group" style="margin-bottom: 24px;">
               <label class="form-label">Upload Payment Receipt Screenshot</label>
               <input type="file" id="custScreenshot" class="form-input" accept="image/*" style="padding: 8px;" required />
@@ -213,7 +208,8 @@
         
         <div style="background: rgba(10,46,24,0.6); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 28px;">
           <div class="tb-summary-row"><span>Booking ID:</span><strong id="finalBookingId" class="gold">-</strong></div>
-          <div class="tb-summary-row"><span>Booking Date:</span><strong id="finalDrawDate">-</strong></div>
+          <div class="tb-summary-row"><span>Draw Date:</span><strong id="finalDrawDate">-</strong></div>
+          <div class="tb-summary-row"><span>Booking Date/Time:</span><strong id="finalBookingTime">-</strong></div>
           <div class="tb-summary-row"><span>Selected Tickets:</span><strong id="finalTicketsList" style="word-break: break-all;">-</strong></div>
           <div class="tb-summary-row"><span>Total Amount:</span><strong id="finalTotal">-</strong></div>
           <div class="tb-summary-row">
@@ -355,6 +351,13 @@
     <i data-lucide="headphones"></i><span>Support</span>
   </a>
 </nav>
+
+<!-- FLOATING SUPPORT BUTTON -->
+<div class="floating-support" id="floatingSupportChat" style="display: none;">
+  <button class="float-btn support" title="Live Support" onclick="openTawkChat()">
+    <span class="float-icon">💬</span>
+  </button>
+</div>
 
 <script src="supabase-config.js"></script>
 <script src="supabase-api.js"></script>
